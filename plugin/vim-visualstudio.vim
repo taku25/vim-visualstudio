@@ -1,6 +1,6 @@
-if exists('g:loaded_visualstudio')
+﻿if exists('g:loaded_visualstudio')
   finish
-"lseif v:version < 702
+elseif v:version < 702
   echoerr 'visualstudio.vim does not work this version of Vim "' . v:version . '".'
   finish
 endif
