@@ -6,8 +6,8 @@ elseif v:version < 702
 endif
 
 " Global options definition."{{{
-let g:visualstudio_vshpath =
-      \ get(g:, 'visualstudio_vshpath', 'VisualStudioController.exe')
+let g:visualstudio_controllerpath =
+      \ get(g:, 'visualstudio_controllerpath', 'VisualStudioController.exe')
 
 let g:visualstudio_outputfilepath =
       \ get(g:, 'visualstudio_outputfilepath', expand($TEMP).'/vs_output.vstxt')
@@ -31,7 +31,7 @@ let g:visualstudio_autoshowoutput =
         \ get(g:, 'visualstudio_autoshowoutput', 1)
 
 let g:visualstudio_enableerrormarker =
-        \ get(g:, 'g:visualstudio_enableerrormarker', 1)
+        \ get(g:, 'g:visualstudio_enableerrormarker', 0)
 "}}}
 "
 let s:visualstudio_temp_result =""
@@ -43,7 +43,7 @@ function! s:visualstudio_make_commnad(commnad, ...)
         let arglist += [shellescape(funargs)]
     endfor
     let nativeargs = join(arglist, ' ')
-    return g:visualstudio_vshpath . " " . a:commnad . " " . nativeargs
+    return g:visualstudio_controllerpath . " " . a:commnad . " " . nativeargs
 endfunction
 
 if g:visualstudio_enableerrormarker == 1
@@ -70,6 +70,16 @@ endfunction
 
 function! s:visualstudio_open_output()
     :call <SID>visualstudio_save_output()
+    exe 'copen '.g:visualstudio_quickfixheight
+    exe 'setlocal errorformat='.g:visualstudio_errorformat
+    exe 'cfile '.g:visualstudio_outputfilepath
+    if g:visualstudio_enableerrormarker == 1
+        :doautocmd QuickFixCmdPost make
+    endif
+endfunction
+
+function! s:visualstudio_open_error_list()
+    :call <SID>visualstudio_save_error_list()
     exe 'copen '.g:visualstudio_quickfixheight
     exe 'setlocal errorformat='.g:visualstudio_errorformat
     exe 'cfile '.g:visualstudio_outputfilepath
@@ -120,15 +130,48 @@ function! s:visualstudio_clean_solution(wait)
     let cmd = <SID>visualstudio_make_commnad("clean", "-t", currentfilefullpath, a:wait == 1 ? "-w" : "")
     let s:visualstudio_temp_result = system(cmd)
     if a:wait == 1 && g:visualstudio_autoshowoutput==1
-        :call <SID>visualstudio_echo_result()
+        :call <SID>visualstudio_open_output()
     endif
 endfunction
 
 "}}}
 
+function! s:visualstudio_compile_file(wait)
+    let currentfilefullpath = expand("%:p")
+    let cmd = <SID>visualstudio_make_commnad("compilefile", "-t", currentfilefullpath, "-f", currentfilefullpath, a:wait == 1 ? "-w" : "")
+    let s:visualstudio_temp_result = system(cmd)
+    if a:wait == 1 && g:visualstudio_autoshowoutput==1
+        :call <SID>visualstudio_open_output()
+    endif
+endfunction
+
+function! s:visualstudio_add_break_point()
+    let currentfilefullpath = expand("%:p")
+    let linenum = line(".")
+    let cmd = <SID>visualstudio_make_commnad("addbreakpoint", "-t", currentfilefullpath, "-f", currentfilefullpath, "-line", linenum)
+    let s:visualstudio_temp_result = system(cmd)
+endfunction
+
+
+
+function! s:visualstudio_open_file()
+    let currentfilefullpath = expand("%:p")
+    let l:cmd = <SID>visualstudio_make_commnad("openfile", "-t", currentfilefullpath, "-f", currentfilefullpath)
+    let s:visualstudio_temp_result = system(cmd)
+endfunction
+
 function! s:visualstudio_save_output()
     let currentfilefullpath = expand("%:p")
     let l:cmd = <SID>visualstudio_make_commnad("getoutput", "-t", currentfilefullpath)
+    let s:visualstudio_temp_result = system(l:cmd)
+    let l:temp = iconv(s:visualstudio_temp_result, 'cp932', &encoding)
+    let l:value = split(l:temp, "\n")
+    call writefile(l:value, g:visualstudio_outputfilepath)
+endfunction
+
+function! s:visualstudio_save_error_list()
+    let currentfilefullpath = expand("%:p")
+    let l:cmd = <SID>visualstudio_make_commnad("geterrorlist", "-t", currentfilefullpath)
     let s:visualstudio_temp_result = system(l:cmd)
     let l:temp = iconv(s:visualstudio_temp_result, 'cp932', &encoding)
     let l:value = split(l:temp, "\n")
@@ -158,7 +201,7 @@ if s:loaded_visualstudio_debug == 1
         echo savefilename
         echo expand(savefilename)
     endfunction
-    command! VSTestFunc :call <SID>visualstudio_save_findResult(0)
+    command! VSTestFunc :call <SID>visualstudio_save_error_list()
 endif
         
 
@@ -171,6 +214,11 @@ command! VSClean :call <SID>visualstudio_clean_solution(1)
 command! VSBuildNoWait :call <SID>visualstudio_build_solution(0)
 command! VSReBuildNoWait :call <SID>visualstudio_rebuild_solution(0)
 command! VSCleanNoWait :call <SID>visualstudio_clean_solution(0)
+command! VSCompile :call <SID>visualstudio_compile_file(1)
+command! VSCompileNoWait :call <SID>visualstudio_compile_file(0)
+command! VSOpenFile :call <SID>visualstudio_open_file()
+command! VSAddBreakPoint :call <SID>visualstudio_add_break_point()
+command! VSErorrList :call <SID>visualstudio_open_error_list()
 command! -nargs=? VSGetFile :call <SID>visualstudio_get_current_file(<f-args>)
 
-let g:loaded_visualstudio = 1
+let g:loaded_visualstudio = 0
