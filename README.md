@@ -55,7 +55,7 @@ winextention周りで32 & 64bitなどの問題が発生してしまう可能性�
  * 編集中のファイルのカーソルがある行にBreakPointの追加
 
 
-##使い方
+##コマンド
 * VSGet  
 VisualStudioで編集中のカレントのファイルをVimで開く  
   引数として Solution名を設定することができます  
