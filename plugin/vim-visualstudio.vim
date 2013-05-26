@@ -1,9 +1,9 @@
-﻿"if exists('g:loaded_visualstudio')
-  "finish
-"elseif v:version < 702
-  "echoerr 'visualstudio.vim does not work this version of Vim "' . v:version . '".'
-  "finish
-"endif
+﻿if exists('g:loaded_visualstudio')
+  finish
+elseif v:version < 702
+  echoerr 'visualstudio.vim does not work this version of Vim "' . v:version . '".'
+  finish
+endif
 
 " Global options definition."{{{
 let g:visualstudio_controllerpath =
@@ -103,8 +103,8 @@ function! s:visualstudio_get_current_file(...)
     
     let s:visualstudio_temp_result = system(cmd)
     let l:temp = iconv(s:visualstudio_temp_result, 'cp932', &encoding)
-    echo l:temp
-    "exe 'e '.l:temp
+    "echo l:temp
+    exe 'e '.l:temp
 endfunction
 
 
