@@ -1,9 +1,9 @@
-﻿if exists('g:loaded_visualstudio')
-  finish
-elseif v:version < 702
-  echoerr 'visualstudio.vim does not work this version of Vim "' . v:version . '".'
-  finish
-endif
+﻿"if exists('g:loaded_visualstudio')
+  "finish
+"elseif v:version < 702
+  "echoerr 'visualstudio.vim does not work this version of Vim "' . v:version . '".'
+  "finish
+"endif
 
 " Global options definition."{{{
 let g:visualstudio_controllerpath =
@@ -43,7 +43,7 @@ function! s:visualstudio_make_commnad(commnad, ...)
         let arglist += [shellescape(funargs)]
     endfor
     let nativeargs = join(arglist, ' ')
-    return g:visualstudio_controllerpath . " " . a:commnad . " " . nativeargs
+    return "\"" . g:visualstudio_controllerpath . "\"" . " " . a:commnad . " " . nativeargs
 endfunction
 
 if g:visualstudio_enableerrormarker == 1
@@ -102,7 +102,9 @@ function! s:visualstudio_get_current_file(...)
     endif
     
     let s:visualstudio_temp_result = system(cmd)
-    exe 'e '.s:visualstudio_temp_result
+    let l:temp = iconv(s:visualstudio_temp_result, 'cp932', &encoding)
+    echo l:temp
+    "exe 'e '.l:temp
 endfunction
 
 
