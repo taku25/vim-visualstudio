@@ -31,7 +31,7 @@ let g:visualstudio_autoshowoutput =
         \ get(g:, 'visualstudio_autoshowoutput', 1)
 
 let g:visualstudio_enableerrormarker =
-        \ get(g:, 'g:visualstudio_enableerrormarker', 0)
+        \ get(g:, 'visualstudio_enableerrormarker', 0)
 "}}}
 "
 let s:visualstudio_temp_result =""
