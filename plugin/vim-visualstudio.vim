@@ -43,7 +43,7 @@ function! s:visualstudio_make_commnad(commnad, ...)
         let arglist += [shellescape(funargs)]
     endfor
     let nativeargs = join(arglist, ' ')
-    return "\"" . g:visualstudio_controllerpath . "\"" . " " . a:commnad . " " . nativeargs
+    return "\"" . expand(g:visualstudio_controllerpath) . "\"" . " " . a:commnad . " " . nativeargs
 endfunction
 
 if g:visualstudio_enableerrormarker == 1
