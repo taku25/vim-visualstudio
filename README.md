@@ -92,6 +92,12 @@ Vimで編集中のファイルを含むVisualStudioの出力をqickfixに表示�
 * VSFindResult1  
 Vimで編集中のファイルを含むVisualStudioの検索結果1をqickfixに表示します
 
-* VSFindResult1  
-Vimで編集中のファイルを含むVisualStudioの検索結果1をqickfixに表示します
+* VSFindResult2  
+Vimで編集中のファイルを含むVisualStudioの検索結果2をqickfixに表示します
+
+* VSRun  
+Vimで編集中のファイルを含むVisualStudioソリューションのデフォルトプロジェクトをデバッグ実行します
+
+* VSStop  
+Vimで編集中のファイルを含むVisualStudioソリューションのデフォルトプロジェクトをデバッグ実行を終了します。
 
