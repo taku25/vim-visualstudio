@@ -196,6 +196,18 @@ function! s:visualstudio_echo_result()
     echo s:visualstudio_temp_result
 endfunction
 
+function! s:visualstudio_run()
+    let currentfilefullpath = expand("%:p")
+	let l:cmd = <SID>visualstudio_make_commnad("debugrun", "-t", currentfilefullpath)
+	system(l:cmd)
+endfunction
+
+function! s:visualstudio_stop()
+    let currentfilefullpath = expand("%:p")
+    let l:cmd = <SID>visualstudio_make_commnad("stopdebugrun", "-t", currentfilefullpath)
+    system(l:cmd)
+endfunction
+
 
 if s:loaded_visualstudio_debug == 1
     function! s:visualstudio_debug_testFunc()
@@ -222,5 +234,7 @@ command! VSOpenFile :call <SID>visualstudio_open_file()
 command! VSAddBreakPoint :call <SID>visualstudio_add_break_point()
 command! VSErorrList :call <SID>visualstudio_open_error_list()
 command! -nargs=? VSGetFile :call <SID>visualstudio_get_current_file(<f-args>)
+command! VSSRun :call <SID>visualstudio_run()
+command! VSStop :call <SID>visualstudio_stop()
 
 let g:loaded_visualstudio = 0
