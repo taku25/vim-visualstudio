@@ -83,6 +83,12 @@ NoWait付きのものはコマンドの完了を待ちません
 Vimで編集中のファイルを含むVisualStudioをコンパイルします  
 NoWait付きのものはコマンドの完了を待ちません
 
+* VSCancelBuild  
+Vimで編集中のファイルを含むVisualStudioがビルド中であればビルドを中止します
+
+* VSRun  or VSDebugRun
+Vimで編集中のファイルを含むVisualStudioで作成済みの実行ファイルを起動します
+
 * VSErorrList  
 Vimで編集中のファイルを含むVisualStudioのエラー一覧をqickfixに表示します
 
