@@ -25,8 +25,6 @@ winextention周りで32 & 64bitなどの問題が発生してしまう可能性�
 ##動作確認 & 必要外部Exe
 * kaoriya版gVim  7.3 32bit & 64bit 
 * Windows 7 32bit / 64 bit
-* 要 vimproc
- * 最新のKaoriya版gVimには標準で入っています
 * 要 VisualStudioController.exe
  * パスが通っているディレクトリかg:visualstudio_controllerpathでフルパス指定  
  * https://github.com/taku25/VisualStudioController  
