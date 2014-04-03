@@ -1,4 +1,6 @@
-﻿if exists('g:loaded_visualstudio')
+﻿" vim:foldmethod=marker:fen:
+
+if exists('g:loaded_visualstudio')
   finish
 elseif v:version < 702
   echoerr 'visualstudio.vim does not work this version of Vim "' . v:version . '".'
@@ -32,10 +34,43 @@ let g:visualstudio_autoshowoutput =
 
 let g:visualstudio_enableerrormarker =
         \ get(g:, 'visualstudio_enableerrormarker', 0)
+
+let g:visualstudio_enablevimproc =
+        \ get(g:, 'visualstudio_enablevimproc', 1)
+
 "}}}
-"
+
 let s:visualstudio_temp_result =""
-let s:loaded_visualstudio_debug = 0
+let s:visualstudio_debug = 1
+let s:visualstudio_install_vimproc = 0
+
+function s:visual_studio_system(command)
+    let l:useVimproc = s:visual_studio_enable_vimproc()
+
+    if l:useVimproc == 1
+        return vimproc#system(a:command)
+    endif
+
+    return system(a:command)
+endfunction
+
+function s:visual_studio_enable_vimproc()
+    if s:visualstudio_install_vimproc == 0
+        try
+            call vimproc#version()
+            let s:visualstudio_install_vimproc = 1
+        catch
+            let s:visualstudio_install_vimproc = 0
+        endtry
+    endif
+
+    let l:temp = 0
+    if s:visualstudio_install_vimproc == 1 && g:visualstudio_enablevimproc == 1
+        let l:temp = 1
+    endif
+    return l:temp
+endfunction
+
 
 function! s:visualstudio_make_commnad(commnad, ...)
     let arglist = []
@@ -213,7 +248,7 @@ function! s:visualstudio_echo_result()
 endfunction
 
 
-if s:loaded_visualstudio_debug == 1
+if s:visualstudio_debug == 1
     function! s:visualstudio_debug_testFunc()
         let savefilename = g:visualstudio_outputfilepath
         echo savefilename
@@ -225,28 +260,57 @@ if s:loaded_visualstudio_debug == 1
         call <SID>visualstudio_cancel_build()
     endfunction
 
-    command! VSTestFunc1 :call <SID>visualstudio_debug_testFunc()
-    command! VSTestFunc2 :call <SID>visualstudio_debug_testFunc2()
 endif
-        
 
-command! VSOutput :call <SID>visualstudio_open_output()
-command! VSFindResult1 :call <SID>visualstudio_open_find_result(0)
-command! VSFindResult2 :call <SID>visualstudio_open_find_result(1)
-command! VSBuild :call <SID>visualstudio_build_solution(1)
-command! VSReBuild :call <SID>visualstudio_rebuild_solution(1)
-command! VSClean :call <SID>visualstudio_clean_solution(1)
-command! VSBuildNoWait :call <SID>visualstudio_build_solution(0)
-command! VSReBuildNoWait :call <SID>visualstudio_rebuild_solution(0)
-command! VSCleanNoWait :call <SID>visualstudio_clean_solution(0)
-command! VSRun :call <SID>visualstudio_run(0)
-command! VSDebugRun :call <SID>visualstudio_run(1)
+
+" vim-visualstudio functions {{{
+
+"compile & build {{{
 command! VSCompile :call <SID>visualstudio_compile_file(1)
 command! VSCompileNoWait :call <SID>visualstudio_compile_file(0)
+command! VSBuild :call <SID>visualstudio_build_solution(1)
+command! VSReBuild :call <SID>visualstudio_rebuild_solution(1)
+command! VSBuildNoWait :call <SID>visualstudio_build_solution(0)
+command! VSReBuildNoWait :call <SID>visualstudio_rebuild_solution(0)
 command! VSCancelBuild :call <SID>visualstudio_cancel_build()
-command! VSOpenFile :call <SID>visualstudio_open_file()
-command! VSAddBreakPoint :call <SID>visualstudio_add_break_point()
-command! VSErorrList :call <SID>visualstudio_open_error_list()
-command! -nargs=? VSGetFile :call <SID>visualstudio_get_current_file(<f-args>)
+"}}}
 
-let g:noaded_visualstudio = 0
+"find {{{
+command! VSFindResult1 :call <SID>visualstudio_open_find_result(0)
+command! VSFindResult2 :call <SID>visualstudio_open_find_result(1)
+"}}}
+
+" run {{{
+command! VSRun :call <SID>visualstudio_run(0)
+command! VSDebugRun :call <SID>visualstudio_run(1)
+"}}}
+
+
+" clean {{{
+command! VSClean :call <SID>visualstudio_clean_solution(1)
+command! VSCleanNoWait :call <SID>visualstudio_clean_solution(0)
+"}}}
+
+" file {{{
+command! VSOpenFile :call <SID>visualstudio_open_file()
+command! -nargs=? VSGetFile :call <SID>visualstudio_get_current_file(<f-args>)
+" }}}
+
+
+"other {{{
+command! VSOutput :call <SID>visualstudio_open_output()
+command! VSErorrList :call <SID>visualstudio_open_error_list()
+command! VSAddBreakPoint :call <SID>visualstudio_add_break_point()
+"}}}
+
+"test function {{{
+if s:visualstudio_debug == 1
+    command! VSTestFunc1 :call <SID>visualstudio_debug_testFunc()
+    command! VSTestFunc2 :call <SID>visualstudio_debug_testFunc2()
+    command! VSTestFunc3 :call <SID>visual_studio_enable_vimproc()
+endif
+"}}}
+
+"}}}
+
+let g:loaded_visualstudio = 0
