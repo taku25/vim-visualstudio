@@ -45,9 +45,9 @@ let s:visualstudio_debug = 1
 let s:visualstudio_install_vimproc = 0
 
 function s:visual_studio_system(command)
-    let l:useVimproc = s:visual_studio_enable_vimproc()
+    let l:enableVimproc = s:visual_studio_enable_vimproc()
 
-    if l:useVimproc == 1
+    if l:enableVimproc == 1
         return vimproc#system(a:command)
     endif
 
@@ -73,12 +73,20 @@ endfunction
 
 
 function! s:visualstudio_make_commnad(commnad, ...)
-    let arglist = []
+    let l:arglist = []
     for funargs in a:000
-        let arglist += [shellescape(funargs)]
+        let l:enableVimproc = s:visual_studio_enable_vimproc()
+        if l:enableVimproc == 1
+            let l:arglist += [funargs]
+        else
+            let l:arglist += [shellescape(funargs)]
+        endif
     endfor
-    let nativeargs = join(arglist, ' ')
-    return "\"" . expand(g:visualstudio_controllerpath) . "\"" . " " . a:commnad . " " . nativeargs
+    let l:nativeargs = join(l:arglist, ' ')
+
+    let l:result = shellescape(expand(g:visualstudio_controllerpath)) . " " . a:commnad . " " . l:nativeargs
+
+    return substitute(l:result, "\\", "/", "g")
 endfunction
 
 if g:visualstudio_enableerrormarker == 1
@@ -123,12 +131,26 @@ function! s:visualstudio_open_error_list()
     endif
 endfunction
 
+" find {{{
 function! s:visualstudio_open_find_result(findType)
     :call <SID>visualstudio_save_findResult(a:findType)
     exe 'copen '.g:visualstudio_quickfixheight
     exe 'setlocal errorformat='.g:visualstudio_findformat
     exe 'cfile '.g:visualstudio_findresultfilepath
 endfunction
+
+function! s:visualstudio_save_findResult(findType)
+    let currentfilefullpath = expand("%:p")
+    let l:cmd = <SID>visualstudio_make_commnad("getfindresult1", "-t", currentfilefullpath)
+    if a:findType == 1
+        let l:cmd = <SID>visualstudio_make_commnad("getfindresult2", "-t", currentfilefullpath)
+    endif
+    let s:visualstudio_temp_result = system(l:cmd)
+    let l:temp = iconv(s:visualstudio_temp_result, 'cp932', &encoding)
+    let l:value = split(l:temp, "\n")
+    call writefile(l:value, g:visualstudio_findresultfilepath)
+endfunction
+"}}}
 
 function! s:visualstudio_get_current_file(...)
     let l:cmd = <SID>visualstudio_make_commnad("getfile")
@@ -143,63 +165,9 @@ function! s:visualstudio_get_current_file(...)
 endfunction
 
 
-" solution."{{{
-function! s:visualstudio_build_solution(wait)
-    let currentfilefullpath = expand("%:p")
-    let l:cmd = <SID>visualstudio_make_commnad("build", "-t", currentfilefullpath, a:wait == 1 ? "-w" : "")
-    let s:visualstudio_temp_result = system(l:cmd)
-    if a:wait == 1 && g:visualstudio_autoshowoutput==1
-        :call <SID>visualstudio_open_output()
-    endif
-endfunction
-
-function! s:visualstudio_rebuild_solution(wait)
-    let currentfilefullpath = expand("%:p")
-    let l:cmd = <SID>visualstudio_make_commnad("rebuild", "-t", currentfilefullpath, a:wait == 1 ? "-w" : "")
-    let s:visualstudio_temp_result = system(l:cmd)
-    if a:wait == 1 && g:visualstudio_autoshowoutput==1
-        :call <SID>visualstudio_open_output()
-    endif
-endfunction
-
-function! s:visualstudio_clean_solution(wait)
-    let currentfilefullpath = expand("%:p")
-    let l:cmd = <SID>visualstudio_make_commnad("clean", "-t", currentfilefullpath, a:wait == 1 ? "-w" : "")
-    let s:visualstudio_temp_result = system(l:cmd)
-    if a:wait == 1 && g:visualstudio_autoshowoutput==1
-        :call <SID>visualstudio_open_output()
-    endif
-endfunction
-
-"}}}
-
-function! s:visualstudio_compile_file(wait)
-    let currentfilefullpath = expand("%:p")
-    let l:cmd = <SID>visualstudio_make_commnad("compilefile", "-t", currentfilefullpath, "-f", currentfilefullpath, a:wait == 1 ? "-w" : "")
-    let s:visualstudio_temp_result = system(l:cmd)
-    if a:wait == 1 && g:visualstudio_autoshowoutput==1
-        :call <SID>visualstudio_open_output()
-    endif
-endfunction
-
-function! s:visualstudio_add_break_point()
-    let currentfilefullpath = expand("%:p")
-    let linenum = line(".")
-    let l:cmd = <SID>visualstudio_make_commnad("addbreakpoint", "-t", currentfilefullpath, "-f", currentfilefullpath, "-line", linenum)
-    let s:visualstudio_temp_result = system(l:cmd)
-endfunction
-
-
-
-function! s:visualstudio_open_file()
-    let currentfilefullpath = expand("%:p")
-    let l:cmd = <SID>visualstudio_make_commnad("openfile", "-t", currentfilefullpath, "-f", currentfilefullpath)
-    let s:visualstudio_temp_result = system(l:cmd)
-endfunction
-
 function! s:visualstudio_save_output()
     let currentfilefullpath = expand("%:p")
-    let l:cmd = <SID>visualstudio_make_commnad("getoutput", "-t", currentfilefullpath)
+    let l:cmd = <SID>visualstudio_make_commnad("getoutput", "-t", "\"". currentfilefullpath . "\"")
     let s:visualstudio_temp_result = system(l:cmd)
     let l:temp = iconv(s:visualstudio_temp_result, 'cp932', &encoding)
     let l:value = split(l:temp, "\n")
@@ -215,23 +183,67 @@ function! s:visualstudio_save_error_list()
     call writefile(l:value, g:visualstudio_outputfilepath)
 endfunction
 
-function! s:visualstudio_save_findResult(findType)
+
+" build solution. & clean solution"{{{
+function! s:visualstudio_build_solution(wait)
     let currentfilefullpath = expand("%:p")
-    let l:cmd = <SID>visualstudio_make_commnad("getfindresult1", "-t", currentfilefullpath)
-    if a:findType == 1
-        let l:cmd = <SID>visualstudio_make_commnad("getfindresult2", "-t", currentfilefullpath)
+    let l:cmd = <SID>visualstudio_make_commnad("build", "-t", shellescape(currentfilefullpath), "-w")
+    echo l:cmd
+    
+    let s:visualstudio_temp_result = <SID>visual_studio_system(l:cmd)
+    if a:wait == 1 && g:visualstudio_autoshowoutput==1
+        :call <SID>visualstudio_open_output()
     endif
-    let s:visualstudio_temp_result = system(l:cmd)
-    let l:temp = iconv(s:visualstudio_temp_result, 'cp932', &encoding)
-    let l:value = split(l:temp, "\n")
-    call writefile(l:value, g:visualstudio_findresultfilepath)
+endfunction
+
+function! s:visualstudio_rebuild_solution(wait)
+    let currentfilefullpath = expand("%:p")
+    let l:cmd = <SID>visualstudio_make_commnad("rebuild", "-t", currentfilefullpath, "-w")
+    let s:visualstudio_temp_result = <SID>visual_studio_system(l:cmd)
+    if a:wait == 1 && g:visualstudio_autoshowoutput==1
+        :call <SID>visualstudio_open_output()
+    endif
+endfunction
+
+function! s:visualstudio_clean_solution(wait)
+    let currentfilefullpath = expand("%:p")
+    let l:cmd = <SID>visualstudio_make_commnad("clean", "-t", currentfilefullpath, "-w")
+    let s:visualstudio_temp_result = <SID>visual_studio_system(l:cmd)
+    if a:wait == 1 && g:visualstudio_autoshowoutput==1
+        :call <SID>visualstudio_open_output()
+    endif
+endfunction
+
+"}}}
+
+function! s:visualstudio_compile_file(wait)
+    let currentfilefullpath = expand("%:p")
+    let l:cmd = <SID>visualstudio_make_commnad("compilefile", "-t", currentfilefullpath, "-f", currentfilefullpath, a:wait == 1 ? "-w" : "")
+    let s:visualstudio_temp_result = <SID>visual_studio_system(l:cmd)
+    if a:wait == 1 && g:visualstudio_autoshowoutput==1
+        :call <SID>visualstudio_open_output()
+    endif
+endfunction
+
+function! s:visualstudio_add_break_point()
+    let currentfilefullpath = expand("%:p")
+    let linenum = line(".")
+    let l:cmd = <SID>visualstudio_make_commnad("addbreakpoint", "-t", currentfilefullpath, "-f", currentfilefullpath, "-line", linenum)
+    let s:visualstudio_temp_result = <SID>visual_studio_system(l:cmd)
+endfunction
+
+
+function! s:visualstudio_open_file()
+    let currentfilefullpath = expand("%:p")
+    let l:cmd = <SID>visualstudio_make_commnad("openfile", "-t", currentfilefullpath, "-f", currentfilefullpath)
+    let s:visualstudio_temp_result = <SID>visual_studio_system(l:cmd)
 endfunction
 
 
 function! s:visualstudio_cancel_build()
     let currentfilefullpath = expand("%:p")
     let l:cmd = <SID>visualstudio_make_commnad("cancelbuild", "-t", currentfilefullpath)
-    let s:visualstudio_temp_result = system(l:cmd)
+    let s:visualstudio_temp_result = <SID>visual_studio_system(l:cmd)
 endfunction
 
 function! s:visualstudio_run(runType)
@@ -240,7 +252,7 @@ function! s:visualstudio_run(runType)
     if a:runType == 1
         let l:cmd = <SID>visualstudio_make_commnad("debugrun", "-t", currentfilefullpath)
     endif
-    let s:visualstudio_temp_result = system(l:cmd)
+    let s:visualstudio_temp_result = <SID>visual_studio_system(l:cmd)
 endfunction
 
 function! s:visualstudio_echo_result()
@@ -291,7 +303,7 @@ command! VSClean :call <SID>visualstudio_clean_solution(1)
 command! VSCleanNoWait :call <SID>visualstudio_clean_solution(0)
 "}}}
 
-" file {{{
+" open & get file {{{
 command! VSOpenFile :call <SID>visualstudio_open_file()
 command! -nargs=? VSGetFile :call <SID>visualstudio_get_current_file(<f-args>)
 " }}}
@@ -312,5 +324,6 @@ endif
 "}}}
 
 "}}}
+
 
 let g:loaded_visualstudio = 0
