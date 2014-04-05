@@ -28,6 +28,7 @@ winextention周りで32 & 64bitなどの問題が発生してしまう可能性�
 * 要 VisualStudioController.exe
  * パスが通っているディレクトリかg:visualstudio_controllerpathでフルパス指定  
  * https://github.com/taku25/VisualStudioController  
+* vimprocがインストールされている場合デフォルトでは自動的にvimprocを使用します
 
 ##インストール
 * NeoBundle 'taku25/vim-visualstudio'  
@@ -37,13 +38,16 @@ winextention周りで32 & 64bitなどの問題が発生してしまう可能性�
 個々の環境のpluginフォルダにコピー
 
 ##機能
-###version 2013/5/24現在
+###version 2014/4/05現在
 * VisualStudioで編集中のファイルをVimで開く
 * Vimで編集中のファイルをVisualStudioで開く
 * VisualStudioで編集中のソリューションに含まれているファイルをVim上で編集していた場合
  * ソリューションのビルド
  * ソリューションのリビルド
  * ソリューションのクリーン
+ * ソリューションのビルドキャンセル
+ * ソリューションの実行
+ * ソリューションのデバッグ実行
  * Vim上で編集中のファイルのみコンパイル
  * ビルド,リビルド,クリーン&コンパイルの結果を表示
  * 検索結果1の表示

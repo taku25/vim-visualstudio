@@ -82,6 +82,15 @@ function! s:visualstudio_get_current_buffer_fullpath()
     return l:currentfilefullpath
 endfunction
 
+function! s:visualstudio_is_wait(wait)
+    let l:enableVimproc = s:visualstudio_enable_vimproc()
+    let l:temp = a:wait
+    if l:enableVimproc == 1
+        let l:temp = 1
+    endif
+    return l:temp
+endfunction
+
 
 function! s:visualstudio_make_commnad(commnad, ...)
     let l:arglist = []
@@ -197,29 +206,31 @@ endfunction
 " build solution. & clean solution"{{{
 function! s:visualstudio_build_solution(wait)
     let currentfilefullpath = <SID>visualstudio_get_current_buffer_fullpath()
-    let l:cmd = <SID>visualstudio_make_commnad("build", "-t", currentfilefullpath, "-w")
-    echo l:cmd
+    let l:iswait = <SID>visualstudio_is_wait(a:wait)
+    let l:cmd = <SID>visualstudio_make_commnad("build", "-t", currentfilefullpath, l:iswait == 1 ? "-w" : "")
     
     let s:visualstudio_temp_result = <SID>visualstudio_system(l:cmd)
-    if a:wait == 1 && g:visualstudio_autoshowoutput==1
+    if l:iswait == 1 && g:visualstudio_autoshowoutput==1
         :call <SID>visualstudio_open_output()
     endif
 endfunction
 
 function! s:visualstudio_rebuild_solution(wait)
     let currentfilefullpath = <SID>visualstudio_get_current_buffer_fullpath()
-    let l:cmd = <SID>visualstudio_make_commnad("rebuild", "-t", currentfilefullpath, "-w")
+    let l:iswait = <SID>visualstudio_is_wait(a:wait)
+    let l:cmd = <SID>visualstudio_make_commnad("rebuild", "-t", currentfilefullpath, l:iswait == 1 ? "-w" : "")
     let s:visualstudio_temp_result = <SID>visualstudio_system(l:cmd)
-    if a:wait == 1 && g:visualstudio_autoshowoutput==1
+    if l:iswait == 1 && g:visualstudio_autoshowoutput==1
         :call <SID>visualstudio_open_output()
     endif
 endfunction
 
 function! s:visualstudio_clean_solution(wait)
     let currentfilefullpath = <SID>visualstudio_get_current_buffer_fullpath()
-    let l:cmd = <SID>visualstudio_make_commnad("clean", "-t", currentfilefullpath, "-w")
+    let l:iswait = <SID>visualstudio_is_wait(a:wait)
+    let l:cmd = <SID>visualstudio_make_commnad("clean", "-t", currentfilefullpath, l:iswait == 1 ? "-w" : "")
     let s:visualstudio_temp_result = <SID>visualstudio_system(l:cmd)
-    if a:wait == 1 && g:visualstudio_autoshowoutput==1
+    if l:iswait == 1 && g:visualstudio_autoshowoutput==1
         :call <SID>visualstudio_open_output()
     endif
 endfunction
@@ -228,9 +239,10 @@ endfunction
 
 function! s:visualstudio_compile_file(wait)
     let currentfilefullpath = <SID>visualstudio_get_current_buffer_fullpath()
-    let l:cmd = <SID>visualstudio_make_commnad("compilefile", "-t", currentfilefullpath, "-f", currentfilefullpath, a:wait == 1 ? "-w" : "")
+    let l:iswait = <SID>visualstudio_is_wait(a:wait)
+    let l:cmd = <SID>visualstudio_make_commnad("compilefile", "-t", currentfilefullpath, "-f", currentfilefullpath, l:iswait == 1 ? "-w" : "")
     let s:visualstudio_temp_result = <SID>visualstudio_system(l:cmd)
-    if a:wait == 1 && g:visualstudio_autoshowoutput==1
+    if l:iswait == 1 && g:visualstudio_autoshowoutput==1
         :call <SID>visualstudio_open_output()
     endif
 endfunction
