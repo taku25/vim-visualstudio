@@ -85,9 +85,11 @@ endfunction
 function! s:visualstudio_is_wait(wait)
     let l:enableVimproc = s:visualstudio_enable_vimproc()
     let l:temp = a:wait
-    if l:enableVimproc == 1
-        let l:temp = 1
-    endif
+
+    "vimproc system_
+    "if l:enableVimproc == 1
+        "let l:temp = 1
+    "endif
     return l:temp
 endfunction
 
