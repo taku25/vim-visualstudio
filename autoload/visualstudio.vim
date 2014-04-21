@@ -77,88 +77,32 @@ endfunction
 "endfunction
 
 
-"if g:visualstudio_enableerrormarker == 1
-    "augroup visualstudio
-        "autocmd!
-        "autocmd QuickFixCmdPost cfile call <SID>visualstudio_seterrortype()
-    "augroup END
-"endif
+if g:visualstudio_enableerrormarker == 1
+    augroup visualstudio
+        autocmd!
+        autocmd QuickFixCmdPost cfile call s:visualstudio_seterrortype()
+    augroup END
+endif
 
-"function! s:visualstudio_seterrortype()
-    "let l:dic = getqflist()
-    "for l:d in l:dic
-        "if (l:d.bufnr == 0 || l:d.lnum == 0)
-            "continue
-        "endif
+function! s:visualstudio_seterrortype()
+    let l:dic = getqflist()
+    for l:d in l:dic
+        if (l:d.bufnr == 0 || l:d.lnum == 0)
+            continue
+        endif
             
-        "let l:d.type = "w"
-        "if strlen(l:d.text) && stridx(l:d.text, 'error') >= 0
-            "let l:d.type = "e"
-        "endif
-    "endfor
-    ":call setqflist(l:dic)
-"endfunction
-
-"function! s:visualstudio_open_output()
-    ":call <SID>visualstudio_save_output()
-    "exe 'copen '.g:visualstudio_quickfixheight
-    "exe 'setlocal errorformat='.g:visualstudio_errorformat
-    "exe 'cfile '.g:visualstudio_outputfilepath
-    "if g:visualstudio_enableerrormarker == 1
-        ":doautocmd QuickFixCmdPost make
-    "endif
-"endfunction
-
-"function! s:visualstudio_open_error_list()
-    ":call <SID>visualstudio_save_error_list()
-    "exe 'copen '.g:visualstudio_quickfixheight
-    "exe 'setlocal errorformat='.g:visualstudio_errorformat
-    "exe 'cfile '.g:visualstudio_outputfilepath
-    "if g:visualstudio_enableerrormarker == 1
-        ":doautocmd QuickFixCmdPost make
-    "endif
-"endfunction
-
-"" find {{{
-"function! s:visualstudio_open_find_result(findType)
-    ":call <SID>visualstudio_save_findResult(a:findType)
-    "exe 'copen '.g:visualstudio_quickfixheight
-    "exe 'setlocal errorformat='.g:visualstudio_findformat
-    "exe 'cfile '.g:visualstudio_findresultfilepath
-"endfunction
-
-"function! s:visualstudio_save_findResult(findType)
-    "let currentfilefullpath = <SID>visualstudio_get_current_buffer_fullpath()
-    "let l:cmd = <SID>visualstudio_make_command("getfindresult1", "-t", currentfilefullpath)
-    "if a:findType == 1
-        "let l:cmd = <SID>visualstudio_make_command("getfindresult2", "-t", currentfilefullpath)
-    "endif
-    "let s:visualstudio_temp_result = system(l:cmd)
-    "let l:temp = iconv(s:visualstudio_temp_result, 'cp932', &encoding)
-    "let l:value = split(l:temp, "\n")
-    "call writefile(l:value, g:visualstudio_findresultfilepath)
-"endfunction
-""}}}
+        let l:d.type = "w"
+        if strlen(l:d.text) && stridx(l:d.text, 'error') >= 0
+            let l:d.type = "e"
+        endif
+    endfor
+    :call setqflist(l:dic)
+endfunction
 
 
 
-"function! s:visualstudio_save_output()
-    "let currentfilefullpath = <SID>visualstudio_get_current_buffer_fullpath()
-    "let l:cmd = <SID>visualstudio_make_command("getoutput", "-t", "\"". currentfilefullpath . "\"")
-    "let s:visualstudio_temp_result = system(l:cmd)
-    "let l:temp = iconv(s:visualstudio_temp_result, 'cp932', &encoding)
-    "let l:value = split(l:temp, "\n")
-    "call writefile(l:value, g:visualstudio_outputfilepath)
-"endfunction
 
-"function! s:visualstudio_save_error_list()
-    "let currentfilefullpath = <SID>visualstudio_get_current_buffer_fullpath()
-    "let l:cmd = <SID>visualstudio_make_command("geterrorlist", "-t", currentfilefullpath)
-    "let s:visualstudio_temp_result = system(l:cmd)
-    "let l:temp = iconv(s:visualstudio_temp_result, 'cp932', &encoding)
-    "let l:value = split(l:temp, "\n")
-    "call writefile(l:value, g:visualstudio_outputfilepath)
-"endfunction
+
 
 
 "" build solution. & clean solution"{{{
@@ -205,15 +149,6 @@ endfunction
     "endif
 "endfunction
 
-"function! s:visualstudio_add_break_point()
-    "let currentfilefullpath = <SID>visualstudio_get_current_buffer_fullpath()
-    "let linenum = line(".")
-    "let l:cmd = <SID>visualstudio_make_command("addbreakpoint", "-t", currentfilefullpath, "-f", currentfilefullpath, "-line", linenum)
-    "let s:visualstudio_temp_result = <SID>visualstudio_system(l:cmd)
-"endfunction
-
-
-
 
 "function! s:visualstudio_cancel_build()
     "let currentfilefullpath = <SID>visualstudio_get_current_buffer_fullpath()
@@ -240,6 +175,7 @@ function! visualstudio#open_file()
 endfunction
 "}}}
 
+" run {{{
 function! visualstudio#run(runType)
     let currentfilefullpath = s:visualstudio_get_current_buffer_fullpath()
     let l:cmd = s:visualstudio_make_command("run", "-t", currentfilefullpath)
@@ -248,8 +184,78 @@ function! visualstudio#run(runType)
     endif
     let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
 endfunction
+"}}}
+
+"" find {{{
+function! s:visualstudio_save_find_result(findType)
+    let currentfilefullpath = s:visualstudio_get_current_buffer_fullpath()
+    let l:cmd = s:visualstudio_make_command("getfindresult1", "-t", currentfilefullpath)
+    if a:findType == 1
+        let l:cmd = s:visualstudio_make_command("getfindresult2", "-t", currentfilefullpath)
+    endif
+    let s:visualstudio_temp_result = system(l:cmd)
+    let l:temp = iconv(s:visualstudio_temp_result, 'cp932', &encoding)
+    let l:value = split(l:temp, "\n")
+    call writefile(l:value, g:visualstudio_findresultfilepath)
+endfunction
+
+function! visualstudio#open_find_result(findType)
+    :call s:visualstudio_save_find_result(a:findType)
+    exe 'copen '.g:visualstudio_quickfixheight
+    exe 'setlocal errorformat='.g:visualstudio_findformat
+    exe 'cfile '.g:visualstudio_findresultfilepath
+endfunction
+
+""}}}
 
 
+"other {{{
+function! s:visualstudio_save_output()
+    let currentfilefullpath = s:visualstudio_get_current_buffer_fullpath()
+    let l:cmd = s:visualstudio_make_command("getoutput", "-t", "\"". currentfilefullpath . "\"")
+    let s:visualstudio_temp_result = system(l:cmd)
+    let l:temp = iconv(s:visualstudio_temp_result, 'cp932', &encoding)
+    let l:value = split(l:temp, "\n")
+    call writefile(l:value, g:visualstudio_outputfilepath)
+endfunction
+
+function! s:visualstudio_save_error_list()
+    let currentfilefullpath = s:visualstudio_get_current_buffer_fullpath()
+    let l:cmd = s:visualstudio_make_command("geterrorlist", "-t", currentfilefullpath)
+    let s:visualstudio_temp_result = system(l:cmd)
+    let l:temp = iconv(s:visualstudio_temp_result, 'cp932', &encoding)
+    let l:value = split(l:temp, "\n")
+    call writefile(l:value, g:visualstudio_outputfilepath)
+endfunction
+
+function! visualstudio#open_output()
+    :call s:visualstudio_save_output()
+    exe 'copen '.g:visualstudio_quickfixheight
+    exe 'setlocal errorformat='.g:visualstudio_errorformat
+    exe 'cfile '.g:visualstudio_outputfilepath
+    if g:visualstudio_enableerrormarker == 1
+        :doautocmd QuickFixCmdPost make
+    endif
+endfunction
+
+function! visualstudio#open_error_list()
+    :call s:visualstudio_save_error_list()
+    exe 'copen '.g:visualstudio_quickfixheight
+    exe 'setlocal errorformat='.g:visualstudio_errorformat
+    exe 'cfile '.g:visualstudio_outputfilepath
+    if g:visualstudio_enableerrormarker == 1
+        :doautocmd QuickFixCmdPost make
+    endif
+endfunction
+
+function! visualstudio#add_break_point()
+    let currentfilefullpath = s:visualstudio_get_current_buffer_fullpath()
+    let linenum = line(".")
+    let l:cmd = s:visualstudio_make_command("addbreakpoint", "-t", currentfilefullpath, "-f", currentfilefullpath, "-line", linenum)
+    let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
+endfunction
+
+"}}}
 
 " Restore 'cpoptions' {{{
 let &cpo = s:save_cpo

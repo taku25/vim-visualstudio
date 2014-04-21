@@ -57,10 +57,6 @@ let g:visualstudio_enablevimproc =
 "command! VSCancelBuild :call <SID>visualstudio_cancel_build()
 "}}}
 
-"find {{{
-"command! VSFindResult1 :call <SID>visualstudio_open_find_result(0)
-"command! VSFindResult2 :call <SID>visualstudio_open_find_result(1)
-"}}}
 
 " run {{{
 command! VSRun call visualstudio#run(0)
@@ -73,6 +69,11 @@ command! VSDebugRun call visualstudio#run(1)
 "command! VSCleanNoWait :call <SID>visualstudio_clean_solution(0)
 "}}}
 
+"find {{{
+command! VSFindResult1 call visualstudio#open_find_result(0)
+command! VSFindResult2 call visualstudio#open_find_result(1)
+"}}}
+
 " open & get file {{{
 command! VSOpenFile call visualstudio#open_file()
 command! -nargs=? VSGetFile call visualstudio#get_current_file(<f-args>)
@@ -80,9 +81,9 @@ command! -nargs=? VSGetFile call visualstudio#get_current_file(<f-args>)
 
 
 "other {{{
-"command! VSOutput :call <SID>visualstudio_open_output()
-"command! VSErorrList :call <SID>visualstudio_open_error_list()
-"command! VSAddBreakPoint :call <SID>visualstudio_add_break_point()
+command! VSOutput call visualstudio#open_output()
+command! VSErorrList call visualstudio#open_error_list()
+command! VSAddBreakPoint call visualstudio#add_break_point()
 "}}}
 
 
