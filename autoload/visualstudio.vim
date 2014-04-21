@@ -65,16 +65,16 @@ function! s:visualstudio_make_command(command, ...)
     return substitute(l:result, "\\", "/", "g")
 endfunction
 
-"function! s:visualstudio_is_wait(wait)
-    "let l:enableVimproc = s:visualstudio_enable_vimproc()
-    "let l:temp = a:wait
+function! s:visualstudio_is_wait(wait)
+    let l:enableVimproc = s:visualstudio_enable_vimproc()
+    let l:temp = a:wait
 
-    ""vimproc system_
-    ""if l:enableVimproc == 1
-        ""let l:temp = 1
-    ""endif
-    "return l:temp
-"endfunction
+    "vimproc system_
+    "if l:enableVimproc == 1
+        "let l:temp = 1
+    "endif
+    return l:temp
+endfunction
 
 
 if g:visualstudio_enableerrormarker == 1
@@ -99,62 +99,58 @@ function! s:visualstudio_seterrortype()
     :call setqflist(l:dic)
 endfunction
 
+"" compile & build "{{{
+function! visualstudio#build_solution(wait)
+    let currentfilefullpath = s:visualstudio_get_current_buffer_fullpath()
+    let l:iswait = s:visualstudio_is_wait(a:wait)
+    let l:cmd = s:visualstudio_make_command("build", "-t", currentfilefullpath, l:iswait == 1 ? "-w" : "")
+    let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
+    if l:iswait == 1 && g:visualstudio_autoshowoutput==1
+        call visualstudio#open_output()
+    endif
+endfunction
+
+function! visualstudio#rebuild_solution(wait)
+    let currentfilefullpath = s:visualstudio_get_current_buffer_fullpath()
+    let l:iswait = s:visualstudio_is_wait(a:wait)
+    let l:cmd = s:visualstudio_make_command("rebuild", "-t", currentfilefullpath, l:iswait == 1 ? "-w" : "")
+    let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
+    if l:iswait == 1 && g:visualstudio_autoshowoutput==1
+        call visualstudio#open_output()
+    endif
+endfunction
+
+function! visualstudio#compile_file(wait)
+    let currentfilefullpath = s:visualstudio_get_current_buffer_fullpath()
+    let l:iswait = s:visualstudio_is_wait(a:wait)
+    let l:cmd = s:visualstudio_make_command("compilefile", "-t", currentfilefullpath, "-f", currentfilefullpath, l:iswait == 1 ? "-w" : "")
+    let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
+    if l:iswait == 1 && g:visualstudio_autoshowoutput==1
+        call visualstudio#open_output()
+    endif
+endfunction
+"}}}
 
 
+" build cancel {{{
+function! visualstudio#cancel_build()
+    let currentfilefullpath = s:visualstudio_get_current_buffer_fullpath()
+    let l:cmd = s:visualstudio_make_command("cancelbuild", "-t", currentfilefullpath)
+    let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
+endfunction
+"}}}
 
-
-
-
-"" build solution. & clean solution"{{{
-"function! s:visualstudio_build_solution(wait)
-    "let currentfilefullpath = <SID>visualstudio_get_current_buffer_fullpath()
-    "let l:iswait = <SID>visualstudio_is_wait(a:wait)
-    "let l:cmd = <SID>visualstudio_make_command("build", "-t", currentfilefullpath, l:iswait == 1 ? "-w" : "")
-    
-    "let s:visualstudio_temp_result = <SID>visualstudio_system(l:cmd)
-    "if l:iswait == 1 && g:visualstudio_autoshowoutput==1
-        ":call <SID>visualstudio_open_output()
-    "endif
-"endfunction
-
-"function! s:visualstudio_rebuild_solution(wait)
-    "let currentfilefullpath = <SID>visualstudio_get_current_buffer_fullpath()
-    "let l:iswait = <SID>visualstudio_is_wait(a:wait)
-    "let l:cmd = <SID>visualstudio_make_command("rebuild", "-t", currentfilefullpath, l:iswait == 1 ? "-w" : "")
-    "let s:visualstudio_temp_result = <SID>visualstudio_system(l:cmd)
-    "if l:iswait == 1 && g:visualstudio_autoshowoutput==1
-        ":call <SID>visualstudio_open_output()
-    "endif
-"endfunction
-
-"function! s:visualstudio_clean_solution(wait)
-    "let currentfilefullpath = <SID>visualstudio_get_current_buffer_fullpath()
-    "let l:iswait = <SID>visualstudio_is_wait(a:wait)
-    "let l:cmd = <SID>visualstudio_make_command("clean", "-t", currentfilefullpath, l:iswait == 1 ? "-w" : "")
-    "let s:visualstudio_temp_result = <SID>visualstudio_system(l:cmd)
-    "if l:iswait == 1 && g:visualstudio_autoshowoutput==1
-        ":call <SID>visualstudio_open_output()
-    "endif
-"endfunction
-
-""}}}
-
-"function! s:visualstudio_compile_file(wait)
-    "let currentfilefullpath = <SID>visualstudio_get_current_buffer_fullpath()
-    "let l:iswait = <SID>visualstudio_is_wait(a:wait)
-    "let l:cmd = <SID>visualstudio_make_command("compilefile", "-t", currentfilefullpath, "-f", currentfilefullpath, l:iswait == 1 ? "-w" : "")
-    "let s:visualstudio_temp_result = <SID>visualstudio_system(l:cmd)
-    "if l:iswait == 1 && g:visualstudio_autoshowoutput==1
-        ":call <SID>visualstudio_open_output()
-    "endif
-"endfunction
-
-
-"function! s:visualstudio_cancel_build()
-    "let currentfilefullpath = <SID>visualstudio_get_current_buffer_fullpath()
-    "let l:cmd = <SID>visualstudio_make_command("cancelbuild", "-t", currentfilefullpath)
-    "let s:visualstudio_temp_result = <SID>visualstudio_system(l:cmd)
-"endfunction
+" clean {{{
+function! visualstudio#clean_solution(wait)
+    let currentfilefullpath = s:visualstudio_get_current_buffer_fullpath()
+    let l:iswait = s:visualstudio_is_wait(a:wait)
+    let l:cmd = s:visualstudio_make_command("clean", "-t", currentfilefullpath, l:iswait == 1 ? "-w" : "")
+    let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
+    if l:iswait == 1 && g:visualstudio_autoshowoutput==1
+        :call visualstudio#open_output()
+    endif
+endfunction
+"}}}
 
 " open & get file {{{
 function! visualstudio#get_current_file(...)
@@ -193,7 +189,7 @@ function! s:visualstudio_save_find_result(findType)
     if a:findType == 1
         let l:cmd = s:visualstudio_make_command("getfindresult2", "-t", currentfilefullpath)
     endif
-    let s:visualstudio_temp_result = system(l:cmd)
+    let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
     let l:temp = iconv(s:visualstudio_temp_result, 'cp932', &encoding)
     let l:value = split(l:temp, "\n")
     call writefile(l:value, g:visualstudio_findresultfilepath)
@@ -211,24 +207,26 @@ endfunction
 
 "other {{{
 function! s:visualstudio_save_output()
-    let currentfilefullpath = s:visualstudio_get_current_buffer_fullpath()
-    let l:cmd = s:visualstudio_make_command("getoutput", "-t", "\"". currentfilefullpath . "\"")
-    let s:visualstudio_temp_result = system(l:cmd)
+    let l:currentfilefullpath = s:visualstudio_get_current_buffer_fullpath()
+    let l:cmd = s:visualstudio_make_command("getoutput", "-t", "\"". l:currentfilefullpath . "\"")
+    let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
     let l:temp = iconv(s:visualstudio_temp_result, 'cp932', &encoding)
     let l:value = split(l:temp, "\n")
     call writefile(l:value, g:visualstudio_outputfilepath)
 endfunction
 
 function! s:visualstudio_save_error_list()
-    let currentfilefullpath = s:visualstudio_get_current_buffer_fullpath()
-    let l:cmd = s:visualstudio_make_command("geterrorlist", "-t", currentfilefullpath)
-    let s:visualstudio_temp_result = system(l:cmd)
+    let l:currentfilefullpath = s:visualstudio_get_current_buffer_fullpath()
+    let l:cmd = s:visualstudio_make_command("geterrorlist", "-t", l:currentfilefullpath)
+    let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
     let l:temp = iconv(s:visualstudio_temp_result, 'cp932', &encoding)
     let l:value = split(l:temp, "\n")
     call writefile(l:value, g:visualstudio_outputfilepath)
 endfunction
 
 function! visualstudio#open_output()
+    "またないと正確に値が取れない時がある...orz
+    sleep 500m
     :call s:visualstudio_save_output()
     exe 'copen '.g:visualstudio_quickfixheight
     exe 'setlocal errorformat='.g:visualstudio_errorformat

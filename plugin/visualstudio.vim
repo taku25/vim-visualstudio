@@ -48,15 +48,17 @@ let g:visualstudio_enablevimproc =
 " vim-visualstudio functions {{{
 
 "compile & build {{{
-"command! VSCompile :call <SID>visualstudio_compile_file(1)
-"command! VSCompileNoWait :call <SID>visualstudio_compile_file(0)
-"command! VSBuild :call <SID>visualstudio_build_solution(1)
-"command! VSReBuild :call <SID>visualstudio_rebuild_solution(1)
-"command! VSBuildNoWait :call <SID>visualstudio_build_solution(0)
-"command! VSReBuildNoWait :call <SID>visualstudio_rebuild_solution(0)
-"command! VSCancelBuild :call <SID>visualstudio_cancel_build()
+command! VSCompile call visualstudio#compile_file(1)
+command! VSCompileNoWait call visualstudio#compile_file(0)
+command! VSBuild call visualstudio#build_solution(1)
+command! VSReBuild call visualstudio#rebuild_solution(1)
+command! VSBuildNoWait call visualstudio#build_solution(0)
+command! VSReBuildNoWait call visualstudio#rebuild_solution(0)
 "}}}
 
+"cancel{{{
+command! VSCancelBuild call visualstudio#cancel_build()
+"}}}
 
 " run {{{
 command! VSRun call visualstudio#run(0)
@@ -65,8 +67,8 @@ command! VSDebugRun call visualstudio#run(1)
 
 
 " clean {{{
-"command! VSClean :call <SID>visualstudio_clean_solution(1)
-"command! VSCleanNoWait :call <SID>visualstudio_clean_solution(0)
+command! VSClean call visualstudio#clean_solution(1)
+command! VSCleanNoWait call visualstudi#clean_solution(0)
 "}}}
 
 "find {{{
