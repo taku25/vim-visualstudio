@@ -11,6 +11,7 @@ pythonを使用していのもあり環境にはよって2.7 & 3.0系の縛り�
 winextention周りで32 & 64bitなどの問題が発生してしまう可能性があります  
     
 このvim-visualstudioプラグインではできるだけそういう他の環境に依存しないように作成したつもりです
+(依存しているVisualStudioController.exeはC#とVisualStudio DTE(COM)を使用して作成されていますのでVisualStudioがインストールされていれば動作可能です)
 
 ##用途 & 目的
 1.Vimでソースファイル編集  
