@@ -3,6 +3,16 @@ let s:save_cpo = &cpo
 set cpo&vim
 "}}}
 
+
+" vital  {{{
+let s:vital = vital#of('visualstudio')
+let s:vital_processmanager = s:vital.import('ProcessManager')
+" }}}
+
+" Create augroup.
+augroup plugin-visualstudio
+augroup END
+
 " local variable.  " {{{1
 let s:visualstudio_temp_result =""
 let s:visualstudio_install_vimproc = 0
