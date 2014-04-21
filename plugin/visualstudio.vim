@@ -74,8 +74,8 @@ command! VSDebugRun call visualstudio#run(1)
 "}}}
 
 " open & get file {{{
-"command! VSOpenFile :call <SID>visualstudio_open_file()
-"command! -nargs=? VSGetFile :call <SID>visualstudio_get_current_file(<f-args>)
+command! VSOpenFile call visualstudio#open_file()
+command! -nargs=? VSGetFile call visualstudio#get_current_file(<f-args>)
 " }}}
 
 

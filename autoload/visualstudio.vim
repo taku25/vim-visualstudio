@@ -140,16 +140,6 @@ endfunction
 "endfunction
 ""}}}
 
-"function! s:visualstudio_get_current_file(...)
-    "let l:cmd = <SID>visualstudio_make_command("getfile")
-    "if a:0
-        "let l:cmd = <SID>visualstudio_make_command("getfile", "-t", a:1)
-    "endif
-    
-    "let s:visualstudio_temp_result = system(l:cmd)
-    "let l:temp = iconv(s:visualstudio_temp_result, 'cp932', &encoding)
-    "exe 'e '.l:temp
-"endfunction
 
 
 "function! s:visualstudio_save_output()
@@ -223,11 +213,6 @@ endfunction
 "endfunction
 
 
-"function! s:visualstudio_open_file()
-    "let currentfilefullpath = <SID>visualstudio_get_current_buffer_fullpath()
-    "let l:cmd = <SID>visualstudio_make_command("openfile", "-t", currentfilefullpath, "-f", currentfilefullpath)
-    "let s:visualstudio_temp_result = <SID>visualstudio_system(l:cmd)
-"endfunction
 
 
 "function! s:visualstudio_cancel_build()
@@ -236,9 +221,24 @@ endfunction
     "let s:visualstudio_temp_result = <SID>visualstudio_system(l:cmd)
 "endfunction
 
-function! s:visualstudio_echo_result()
-    echo s:visualstudio_temp_result
+" open & get file {{{
+function! visualstudio#get_current_file(...)
+    let l:cmd = s:visualstudio_make_command("getfile")
+    if a:0
+        let l:cmd = s:visualstudio_make_command("getfile", "-t", a:1)
+    endif
+    
+    let s:visualstudio_temp_result = system(l:cmd)
+    let l:temp = iconv(s:visualstudio_temp_result, 'cp932', &encoding)
+    exe 'e '.l:temp
 endfunction
+
+function! visualstudio#open_file()
+    let currentfilefullpath = s:visualstudio_get_current_buffer_fullpath()
+    let l:cmd = s:visualstudio_make_command("openfile", "-t", currentfilefullpath, "-f", currentfilefullpath)
+    let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
+endfunction
+"}}}
 
 function! visualstudio#run(runType)
     let currentfilefullpath = s:visualstudio_get_current_buffer_fullpath()
