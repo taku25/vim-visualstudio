@@ -43,6 +43,9 @@ let g:visualstudio_enableerrormarker =
 let g:visualstudio_enablevimproc =
       \ get(g:, 'visualstudio_enablevimproc', 1)
 
+let g:visualstudio_updatetime =
+      \ get(g:, 'visualstudio_updatetime', 2000)
+
 "}}}
 
 " vim-visualstudio functions {{{
@@ -82,8 +85,8 @@ command! -nargs=? VSGetFile call visualstudio#get_current_file(<f-args>)
 
 
 "other {{{
-command! VSOutput call visualstudio#open_output()
-command! VSErorrList call visualstudio#open_error_list()
+command! VSOutput call visualstudio#open_output("")
+command! VSErorrList call visualstudio#open_error_list("")
 command! VSAddBreakPoint call visualstudio#add_break_point()
 "}}}
 

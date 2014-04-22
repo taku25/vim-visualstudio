@@ -7,6 +7,7 @@ set cpo&vim
 " vital  {{{
 let s:vital = vital#of('visualstudio')
 let s:vital_processmanager = s:vital.import('ProcessManager')
+let s:vital_datastring = s:vital.import('Data.String')
 " }}}
 
 " Create augroup.
@@ -16,7 +17,8 @@ augroup END
 " local variable.  " {{{1
 let s:visualstudio_temp_result =""
 let s:visualstudio_install_vimproc = 0
-let s:visualstudio_last_build_filename = ""
+let s:visualstudio_last_build_solution_fullpath = ""
+let s:visualstudio_global_update_time = &updatetime
 "}}}
 
 function! s:visualstudio_enable_vimproc()
@@ -100,13 +102,13 @@ endfunction
 
 "" compile & build "{{{
 function! visualstudio#build_solution(buildtype, wait)
-    let currentfilefullpath = s:visualstudio_get_current_buffer_fullpath()
-    let l:cmd = s:visualstudio_make_command(a:buildtype, "-t", currentfilefullpath, a:wait)
-
+    let l:currentfilefullpath = s:visualstudio_get_current_buffer_fullpath()
+    let l:cmd = s:visualstudio_make_command(a:buildtype, "-t", l:currentfilefullpath, a:wait)
+    
     if a:wait == "-w"
         let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
         if g:visualstudio_showautooutput == 1
-            call visualstudio#open_output()
+            call visualstudio#open_output(l:currentfilefullpath)
         endif
     else
         let l:enableVimproc = s:visualstudio_enable_vimproc()
@@ -120,25 +122,60 @@ function! visualstudio#build_solution(buildtype, wait)
                 "waitなし かつ vimprocが使用できる かつ　自動表示時のみ
                 "processmanagerを使用する
                 "{
-                    s:vital_processmanager.kill("visualstudio_build", l:cmd)
-                    call visualstudio#cancel_build(s:visualstudio_last_build_filename)
-                    let s:visualstudio_last_build_filename = currentfilefullpath
+                    let l:tempcmd = s:visualstudio_make_command("getsolutionfullpath", "-t", l:currentfilefullpath)
+                    let l:temp_result = s:visualstudio_system(l:tempcmd)
+                    let l:solutionfullpath = iconv(l:temp_result, 'cp932', &encoding)
+                    let l:solutionfullpath = s:vital_datastring.chop(l:solutionfullpath)        
+                    if s:visualstudio_last_build_solution_fullpath == l:solutionfullpath
+                        "同じsolutionをビルドなら前のを消しておく
+                        call visualstudio#cancel_build(l:solutionfullpath)
+                        let &updatetime = s:visualstudio_global_update_time
+                        augroup plugin-visualstudio
+                            autocmd! 
+                        augroup END
+                        try
+                            s:vital_processmanager.kill("visualstudio_build")
+                        catch
+                        endtry
+                    endif
+                    let s:visualstudio_last_build_solution_fullpath = l:solutionfullpath
                 "}
-                "動いているものがあれば消す(現状同時に動けるのは一つ
-                s:vital_processmanager.touch("visualstudio_build", l:cmd)
+                "起動
+                call s:vital_processmanager.touch("visualstudio_build", l:cmd)
+                let &updatetime = g:visualstudio_updatetime
+                "ちょっとまち
+                sleep 500m
+                augroup plugin-visualstudio
+                    execute 'autocmd! CursorHold,CursorHoldI * call' 's:visualstudio_check_finished()'
+                augroup END
             endif
         endif
     endif
 endfunction
 
 function! visualstudio#compile_file(wait)
-    let currentfilefullpath = s:visualstudio_get_current_buffer_fullpath()
-    let l:cmd = s:visualstudio_make_command("compilefile", "-t", currentfilefullpath, "-f", currentfilefullpath, a:wait)
+    let l:currentfilefullpath = s:visualstudio_get_current_buffer_fullpath()
+    let l:cmd = s:visualstudio_make_command("compilefile", "-t", l:currentfilefullpath, "-f", l:currentfilefullpath, a:wait)
     let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
     if a:wait != "" && g:visualstudio_showautooutput==1
-        call visualstudio#open_output()
+        call visualstudio#open_output(l:currentfilefullpath)
     endif
 endfunction
+                    
+function! s:visualstudio_check_finished()
+    let l:cmd = s:visualstudio_make_command("getbuildstatus", "-t", s:visualstudio_last_build_solution_fullpath)
+    let l:status = iconv(s:visualstudio_system(l:cmd), 'cp932', &encoding)
+    if l:status != "InProgress"
+        "もどし
+        let &updatetime = s:visualstudio_global_update_time
+        augroup plugin-visualstudio
+            autocmd! 
+        augroup END
+        call s:vital_processmanager.kill("visualstudio_build")
+        call visualstudio#open_output(shellescape(s:visualstudio_last_build_solution_fullpath))
+    endif
+endfunction
+
 "}}}
 
 
@@ -168,7 +205,7 @@ function! visualstudio#get_current_file(...)
         let l:cmd = s:visualstudio_make_command("getfile", "-t", a:1)
     endif
     
-    let s:visualstudio_temp_result = system(l:cmd)
+    let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
     let l:temp = iconv(s:visualstudio_temp_result, 'cp932', &encoding)
     exe 'e '.l:temp
 endfunction
@@ -215,17 +252,17 @@ endfunction
 
 
 "other {{{
-function! s:visualstudio_save_output()
-    let l:currentfilefullpath = s:visualstudio_get_current_buffer_fullpath()
-    let l:cmd = s:visualstudio_make_command("getoutput", "-t", "\"". l:currentfilefullpath . "\"")
+function! s:visualstudio_save_output(target)
+    let l:currentfilefullpath = a:target == "" ? s:visualstudio_get_current_buffer_fullpath() : a:target
+    let l:cmd = s:visualstudio_make_command("getoutput", "-t", l:currentfilefullpath)
     let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
     let l:temp = iconv(s:visualstudio_temp_result, 'cp932', &encoding)
     let l:value = split(l:temp, "\n")
     call writefile(l:value, g:visualstudio_outputfilepath)
 endfunction
 
-function! s:visualstudio_save_error_list()
-    let l:currentfilefullpath = s:visualstudio_get_current_buffer_fullpath()
+function! s:visualstudio_save_error_list(target)
+    let l:currentfilefullpath = a:target == "" ? s:visualstudio_get_current_buffer_fullpath() : a:target
     let l:cmd = s:visualstudio_make_command("geterrorlist", "-t", l:currentfilefullpath)
     let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
     let l:temp = iconv(s:visualstudio_temp_result, 'cp932', &encoding)
@@ -233,10 +270,10 @@ function! s:visualstudio_save_error_list()
     call writefile(l:value, g:visualstudio_outputfilepath)
 endfunction
 
-function! visualstudio#open_output()
+function! visualstudio#open_output(target)
     "またないと正確に値が取れない時がある...orz
     sleep 500m
-    :call s:visualstudio_save_output()
+    :call s:visualstudio_save_output(a:target)
     exe 'copen '.g:visualstudio_quickfixheight
     exe 'setlocal errorformat='.g:visualstudio_errorformat
     exe 'cfile '.g:visualstudio_outputfilepath
@@ -245,8 +282,9 @@ function! visualstudio#open_output()
     endif
 endfunction
 
-function! visualstudio#open_error_list()
-    :call s:visualstudio_save_error_list()
+function! visualstudio#open_error_list(target)
+    sleep 500m
+    :call s:visualstudio_save_error_list(a:target)
     exe 'copen '.g:visualstudio_quickfixheight
     exe 'setlocal errorformat='.g:visualstudio_errorformat
     exe 'cfile '.g:visualstudio_outputfilepath
