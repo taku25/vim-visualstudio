@@ -16,6 +16,7 @@ augroup END
 " local variable.  " {{{1
 let s:visualstudio_temp_result =""
 let s:visualstudio_install_vimproc = 0
+let s:visualstudio_last_build_filename = ""
 "}}}
 
 function! s:visualstudio_enable_vimproc()
@@ -102,9 +103,31 @@ function! visualstudio#build_solution(buildtype, wait)
     let currentfilefullpath = s:visualstudio_get_current_buffer_fullpath()
     let l:cmd = s:visualstudio_make_command(a:buildtype, "-t", currentfilefullpath, a:wait)
 
-    let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
-    if a:wait != "" && g:visualstudio_autoshowoutput==1
-        call visualstudio#open_output()
+    if a:wait == "-w"
+        let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
+        if g:visualstudio_showautooutput == 1
+            call visualstudio#open_output()
+        endif
+    else
+        let l:enableVimproc = s:visualstudio_enable_vimproc()
+        "waitなしでvimprocが使えない時は自動表示はしない
+        if l:enableVimproc == 0
+            let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
+        else
+            if g:visualstudio_showautooutput == 0
+                let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
+            else
+                "waitなし かつ vimprocが使用できる かつ　自動表示時のみ
+                "processmanagerを使用する
+                "{
+                    s:vital_processmanager.kill("visualstudio_build", l:cmd)
+                    call visualstudio#cancel_build(s:visualstudio_last_build_filename)
+                    let s:visualstudio_last_build_filename = currentfilefullpath
+                "}
+                "動いているものがあれば消す(現状同時に動けるのは一つ
+                s:vital_processmanager.touch("visualstudio_build", l:cmd)
+            endif
+        endif
     endif
 endfunction
 
@@ -112,7 +135,7 @@ function! visualstudio#compile_file(wait)
     let currentfilefullpath = s:visualstudio_get_current_buffer_fullpath()
     let l:cmd = s:visualstudio_make_command("compilefile", "-t", currentfilefullpath, "-f", currentfilefullpath, a:wait)
     let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
-    if a:wait != "" && g:visualstudio_autoshowoutput==1
+    if a:wait != "" && g:visualstudio_showautooutput==1
         call visualstudio#open_output()
     endif
 endfunction
@@ -120,9 +143,12 @@ endfunction
 
 
 " build cancel {{{
-function! visualstudio#cancel_build()
-    let currentfilefullpath = s:visualstudio_get_current_buffer_fullpath()
-    let l:cmd = s:visualstudio_make_command("cancelbuild", "-t", currentfilefullpath)
+function! visualstudio#cancel_build(fullpath)
+    let l:currentfilefullpath = a:fullpath
+    if a:fullpath == ""
+        let l:currentfilefullpath = s:visualstudio_get_current_buffer_fullpath() 
+    endif
+    let l:cmd = s:visualstudio_make_command("cancelbuild", "-t", l:currentfilefullpath)
     let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
 endfunction
 "}}}

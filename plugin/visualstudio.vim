@@ -34,8 +34,8 @@ let g:visualstudio_errorformat =
 let g:visualstudio_findformat =
       \ get(g:, 'visualstudio_findformat', '%f\(%l\):%m')
 
-let g:visualstudio_autoshowoutput =
-      \ get(g:, 'visualstudio_autoshowoutput', 1)
+let g:visualstudio_showautooutput =
+      \ get(g:, 'visualstudio_showautooutput', 1)
 
 let g:visualstudio_enableerrormarker =
       \ get(g:, 'visualstudio_enableerrormarker', 0)
@@ -57,7 +57,7 @@ command! VSReBuildNoWait call visualstudio#build_solution("rebuild", "")
 "}}}
 
 "cancel{{{
-command! VSCancelBuild call visualstudio#cancel_build()
+command! VSCancelBuild call visualstudio#cancel_build("")
 "}}}
 
 " run {{{
