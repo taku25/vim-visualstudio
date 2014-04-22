@@ -50,10 +50,10 @@ let g:visualstudio_enablevimproc =
 "compile & build {{{
 command! VSCompile call visualstudio#compile_file(1)
 command! VSCompileNoWait call visualstudio#compile_file(0)
-command! VSBuild call visualstudio#build_solution(1)
-command! VSReBuild call visualstudio#rebuild_solution(1)
-command! VSBuildNoWait call visualstudio#build_solution(0)
-command! VSReBuildNoWait call visualstudio#rebuild_solution(0)
+command! VSBuild call visualstudio#build_solution(0, 1)
+command! VSReBuild call visualstudio#build_solution(1, 1)
+command! VSBuildNoWait call visualstudio#build_solution(0, 0)
+command! VSReBuildNoWait call visualstudio#build_solution(1, 0)
 "}}}
 
 "cancel{{{
@@ -67,8 +67,7 @@ command! VSDebugRun call visualstudio#run(1)
 
 
 " clean {{{
-command! VSClean call visualstudio#clean_solution(1)
-command! VSCleanNoWait call visualstudi#clean_solution(0)
+command! VSClean call visualstudio#clean_solution()
 "}}}
 
 "find {{{

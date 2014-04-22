@@ -110,32 +110,24 @@ function! s:visualstudio_seterrortype()
 endfunction
 
 "" compile & build "{{{
-function! visualstudio#build_solution(wait)
+function! visualstudio#build_solution(rebuild, wait)
     let currentfilefullpath = s:visualstudio_get_current_buffer_fullpath()
-    let l:iswait = s:visualstudio_is_wait(a:wait)
-    let l:cmd = s:visualstudio_make_command("build", "-t", currentfilefullpath, l:iswait == 1 ? "-w" : "")
-    let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
-    if l:iswait == 1 && g:visualstudio_autoshowoutput==1
-        call visualstudio#open_output()
-    endif
-endfunction
+    let l:iswait = a:wait == 1 ? "-w" : ""
+    let l:builcmd = a:rebuild == 1 ? "rebuild" : "build"
+    let l:cmd = s:visualstudio_make_command(l:builcmd, "-t", currentfilefullpath, l:iswait)
 
-function! visualstudio#rebuild_solution(wait)
-    let currentfilefullpath = s:visualstudio_get_current_buffer_fullpath()
-    let l:iswait = s:visualstudio_is_wait(a:wait)
-    let l:cmd = s:visualstudio_make_command("rebuild", "-t", currentfilefullpath, l:iswait == 1 ? "-w" : "")
     let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
-    if l:iswait == 1 && g:visualstudio_autoshowoutput==1
+    if l:iswait != "" && g:visualstudio_autoshowoutput==1
         call visualstudio#open_output()
     endif
 endfunction
 
 function! visualstudio#compile_file(wait)
     let currentfilefullpath = s:visualstudio_get_current_buffer_fullpath()
-    let l:iswait = s:visualstudio_is_wait(a:wait)
-    let l:cmd = s:visualstudio_make_command("compilefile", "-t", currentfilefullpath, "-f", currentfilefullpath, l:iswait == 1 ? "-w" : "")
+    let l:iswait = a:wait == 1 ? "-w" : ""
+    let l:cmd = s:visualstudio_make_command("compilefile", "-t", currentfilefullpath, "-f", currentfilefullpath, l:iswait)
     let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
-    if l:iswait == 1 && g:visualstudio_autoshowoutput==1
+    if l:iswait != "" && g:visualstudio_autoshowoutput==1
         call visualstudio#open_output()
     endif
 endfunction
@@ -151,14 +143,10 @@ endfunction
 "}}}
 
 " clean {{{
-function! visualstudio#clean_solution(wait)
+function! visualstudio#clean_solution()
     let currentfilefullpath = s:visualstudio_get_current_buffer_fullpath()
-    let l:iswait = s:visualstudio_is_wait(a:wait)
-    let l:cmd = s:visualstudio_make_command("clean", "-t", currentfilefullpath, l:iswait == 1 ? "-w" : "")
+    let l:cmd = s:visualstudio_make_command("clean", "-t", currentfilefullpath )
     let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
-    if l:iswait == 1 && g:visualstudio_autoshowoutput==1
-        :call visualstudio#open_output()
-    endif
 endfunction
 "}}}
 
