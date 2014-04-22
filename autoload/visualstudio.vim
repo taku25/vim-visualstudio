@@ -75,18 +75,6 @@ function! s:visualstudio_make_command(command, ...)
     return substitute(l:result, "\\", "/", "g")
 endfunction
 
-function! s:visualstudio_is_wait(wait)
-    let l:enableVimproc = s:visualstudio_enable_vimproc()
-    let l:temp = a:wait
-
-    "vimproc system_
-    "if l:enableVimproc == 1
-        "let l:temp = 1
-    "endif
-    return l:temp
-endfunction
-
-
 if g:visualstudio_enableerrormarker == 1
     augroup visualstudio
         autocmd!
