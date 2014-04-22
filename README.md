@@ -77,10 +77,10 @@ NoWait付きのものはコマンドの完了を待ちません
 * VSReBuild or VSReBuildNoWait  
 Vimで編集中のファイルを含むVisualStudioをリビルドします  
 NoWait付きのものはコマンドの完了を待ちません
+NoWait+vimproc+quickfix設定にされているときは場合はビルド完了時に自動的に結果をquickfix表示します
 
-* VSClean or VSCleanNoWait  
+* VSClean  
 Vimで編集中のファイルを含むVisualStudioをクリーンします  
-NoWait付きのものはコマンドの完了を待ちません
 
 * VSCompile or VSCompileNoWait  
 Vimで編集中のファイルを含むVisualStudioをコンパイルします  
