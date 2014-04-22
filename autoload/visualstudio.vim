@@ -79,7 +79,7 @@ function! s:visualstudio_make_command(command, ...)
 endfunction
 
 if g:visualstudio_enableerrormarker == 1
-    augroup plugin-visualstudio-erroetype
+    augroup plugin-visualstudio-errortype
         autocmd!
         autocmd QuickFixCmdPost cfile call s:visualstudio_seterrortype()
     augroup END
