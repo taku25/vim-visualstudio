@@ -26,7 +26,7 @@ let g:visualstudio_getfileresultfilepath =
       \ get(g:, 'visualstudio_getfileresultfilepath', expand($TEMP).'/vs_getfileresult.vstxt')
 
 let g:visualstudio_quickfixheight =
-      \ get(g:, 'visualstudio_quickfixheight', 30)
+      \ get(g:, 'visualstudio_quickfixheight', 10)
 
 let g:visualstudio_errorformat =
       \ get(g:, 'visualstudio_errorformat', '%f\(%l\):\ %m')
