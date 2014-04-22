@@ -3,6 +3,8 @@
 ##説明
 VimからVisualStudioに対しての操作を行うプラグイン
 
+![image](https://dl.dropboxusercontent.com/u/45602523/vim-visualstudio.gif)
+
 ##参考
 同じようなプラグインで  
 visual_studio.vim  
