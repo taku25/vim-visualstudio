@@ -98,24 +98,21 @@ function! s:visualstudio_seterrortype()
 endfunction
 
 "" compile & build "{{{
-function! visualstudio#build_solution(rebuild, wait)
+function! visualstudio#build_solution(buildtype, wait)
     let currentfilefullpath = s:visualstudio_get_current_buffer_fullpath()
-    let l:iswait = a:wait == 1 ? "-w" : ""
-    let l:builcmd = a:rebuild == 1 ? "rebuild" : "build"
-    let l:cmd = s:visualstudio_make_command(l:builcmd, "-t", currentfilefullpath, l:iswait)
+    let l:cmd = s:visualstudio_make_command(a:buildtype, "-t", currentfilefullpath, a:wait)
 
     let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
-    if l:iswait != "" && g:visualstudio_autoshowoutput==1
+    if a:wait != "" && g:visualstudio_autoshowoutput==1
         call visualstudio#open_output()
     endif
 endfunction
 
 function! visualstudio#compile_file(wait)
     let currentfilefullpath = s:visualstudio_get_current_buffer_fullpath()
-    let l:iswait = a:wait == 1 ? "-w" : ""
-    let l:cmd = s:visualstudio_make_command("compilefile", "-t", currentfilefullpath, "-f", currentfilefullpath, l:iswait)
+    let l:cmd = s:visualstudio_make_command("compilefile", "-t", currentfilefullpath, "-f", currentfilefullpath, a:wait)
     let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
-    if l:iswait != "" && g:visualstudio_autoshowoutput==1
+    if a:wait != "" && g:visualstudio_autoshowoutput==1
         call visualstudio#open_output()
     endif
 endfunction

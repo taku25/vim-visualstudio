@@ -48,12 +48,12 @@ let g:visualstudio_enablevimproc =
 " vim-visualstudio functions {{{
 
 "compile & build {{{
-command! VSCompile call visualstudio#compile_file(1)
-command! VSCompileNoWait call visualstudio#compile_file(0)
-command! VSBuild call visualstudio#build_solution(0, 1)
-command! VSReBuild call visualstudio#build_solution(1, 1)
-command! VSBuildNoWait call visualstudio#build_solution(0, 0)
-command! VSReBuildNoWait call visualstudio#build_solution(1, 0)
+command! VSCompile call visualstudio#compile_file("-w")
+command! VSCompileNoWait call visualstudio#compile_file("")
+command! VSBuild call visualstudio#build_solution("build", "-w")
+command! VSReBuild call visualstudio#build_solution("rebuild", "-w")
+command! VSBuildNoWait call visualstudio#build_solution("build", "")
+command! VSReBuildNoWait call visualstudio#build_solution("rebuild", "")
 "}}}
 
 "cancel{{{
