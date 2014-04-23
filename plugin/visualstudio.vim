@@ -19,6 +19,9 @@ let g:visualstudio_controllerpath =
 let g:visualstudio_outputfilepath =
       \ get(g:, 'visualstudio_outputfilepath', expand($TEMP).'/vs_output.vstxt')
 
+let g:visualstudio_errorlistfilepath =
+      \ get(g:, 'visualstudio_errorlistfilepath', expand($TEMP).'/vs_errorlist.vstxt')
+
 let g:visualstudio_findresultfilepath =
       \ get(g:, 'visualstudio_findresultfilepath', expand($TEMP).'/vs_findresult.vstxt')
 
@@ -30,6 +33,12 @@ let g:visualstudio_quickfixheight =
 
 let g:visualstudio_errorformat =
       \ get(g:, 'visualstudio_errorformat', '%.\*>%f\(%l\):\ %m')
+<<<<<<< HEAD
+=======
+
+let g:visualstudio_errorlistformat =
+      \ get(g:, 'visualstudio_errorlistformat', '%f\ \(%l\):\ %m')
+>>>>>>> origin/nextVersion
 
 let g:visualstudio_findformat =
       \ get(g:, 'visualstudio_findformat', '%f\(%l\):%m')
