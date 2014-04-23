@@ -267,7 +267,7 @@ function! s:visualstudio_save_error_list(target)
     let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
     let l:temp = iconv(s:visualstudio_temp_result, 'cp932', &encoding)
     let l:value = split(l:temp, "\n")
-    call writefile(l:value, g:visualstudio_outputfilepath)
+    call writefile(l:value, g:visualstudio_errorlistfilepath)
 endfunction
 
 function! visualstudio#open_output(target)
@@ -276,7 +276,6 @@ function! visualstudio#open_output(target)
     :call s:visualstudio_save_output(a:target)
     let &errorformat = g:visualstudio_errorformat
     exe 'copen '.g:visualstudio_quickfixheight
-    "exe 'setlocal errorformat='.g:visualstudio_errorformat
     exe 'cfile '.g:visualstudio_outputfilepath
     if g:visualstudio_enableerrormarker == 1
         :doautocmd QuickFixCmdPost make
@@ -286,10 +285,10 @@ endfunction
 function! visualstudio#open_error_list(target)
     sleep 500m
     :call s:visualstudio_save_error_list(a:target)
-    let &errorformat = g:visualstudio_errorformat
+    let &errorformat = g:visualstudio_errorlistformat
     exe 'copen '.g:visualstudio_quickfixheight
-    "exe 'setlocal errorformat='.g:visualstudio_errorformat
-    exe 'cfile '.g:visualstudio_outputfilepath
+    exe 'cfile '.g:visualstudio_errorlistfilepath
+    echo "AB"
     if g:visualstudio_enableerrormarker == 1
         :doautocmd QuickFixCmdPost make
     endif
