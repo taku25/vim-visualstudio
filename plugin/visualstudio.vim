@@ -33,12 +33,9 @@ let g:visualstudio_quickfixheight =
 
 let g:visualstudio_errorformat =
       \ get(g:, 'visualstudio_errorformat', '%.\*>%f\(%l\):\ %m')
-<<<<<<< HEAD
-=======
 
 let g:visualstudio_errorlistformat =
       \ get(g:, 'visualstudio_errorlistformat', '%f\ \(%l\):\ %m')
->>>>>>> origin/nextVersion
 
 let g:visualstudio_findformat =
       \ get(g:, 'visualstudio_findformat', '%f\(%l\):%m')
@@ -106,7 +103,6 @@ command! VSAddBreakPoint call visualstudio#add_break_point()
 let &cpo = s:save_cpo
 unlet s:save_cpo
 " }}}
-
 
 " vim:foldmethod=marker:fen:
 
