@@ -274,8 +274,9 @@ function! visualstudio#open_output(target)
     "またないと正確に値が取れない時がある...orz
     sleep 500m
     :call s:visualstudio_save_output(a:target)
+    let &errorformat = g:visualstudio_errorformat
     exe 'copen '.g:visualstudio_quickfixheight
-    exe 'setlocal errorformat='.g:visualstudio_errorformat
+    "exe 'setlocal errorformat='.g:visualstudio_errorformat
     exe 'cfile '.g:visualstudio_outputfilepath
     if g:visualstudio_enableerrormarker == 1
         :doautocmd QuickFixCmdPost make
@@ -285,8 +286,9 @@ endfunction
 function! visualstudio#open_error_list(target)
     sleep 500m
     :call s:visualstudio_save_error_list(a:target)
+    let &errorformat = g:visualstudio_errorformat
     exe 'copen '.g:visualstudio_quickfixheight
-    exe 'setlocal errorformat='.g:visualstudio_errorformat
+    "exe 'setlocal errorformat='.g:visualstudio_errorformat
     exe 'cfile '.g:visualstudio_outputfilepath
     if g:visualstudio_enableerrormarker == 1
         :doautocmd QuickFixCmdPost make
