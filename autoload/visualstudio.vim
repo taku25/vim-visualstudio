@@ -124,7 +124,7 @@ function! visualstudio#build_solution(buildtype, wait)
                 "{
                     let l:tempcmd = s:visualstudio_make_command("getsolutionfullpath", "-t", l:currentfilefullpath)
                     let l:temp_result = s:visualstudio_system(l:tempcmd)
-                    let l:solutionfullpath = iconv(l:temp_result, 'cp932', &encoding)
+                    let l:solutionfullpath = iconv(l:temp_result, g:visualstudio_terminalencoding, &encoding)
                     let l:solutionfullpath = s:vital_datastring.chop(l:solutionfullpath)        
                     if s:visualstudio_last_build_solution_fullpath == l:solutionfullpath
                         "同じsolutionをビルドなら前のを消しておく
@@ -164,7 +164,7 @@ endfunction
                     
 function! s:visualstudio_check_finished()
     let l:cmd = s:visualstudio_make_command("getbuildstatus", "-t", s:visualstudio_last_build_solution_fullpath)
-    let l:status = iconv(s:visualstudio_system(l:cmd), 'cp932', &encoding)
+    let l:status = iconv(s:visualstudio_system(l:cmd), g:visualstudio_terminalencoding, &encoding)
     if l:status != "InProgress"
         "もどし
         let &updatetime = s:visualstudio_global_update_time
@@ -180,11 +180,8 @@ endfunction
 
 
 " build cancel {{{
-function! visualstudio#cancel_build(fullpath)
-    let l:currentfilefullpath = a:fullpath
-    if a:fullpath == ""
-        let l:currentfilefullpath = s:visualstudio_get_current_buffer_fullpath() 
-    endif
+function! visualstudio#cancel_build(...)
+    let l:currentfilefullpath = a:0 ? a:0 : s:visualstudio_get_current_buffer_fullpath() 
     let l:cmd = s:visualstudio_make_command("cancelbuild", "-t", l:currentfilefullpath)
     let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
 endfunction
@@ -206,7 +203,7 @@ function! visualstudio#get_current_file(...)
     endif
     
     let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
-    let l:temp = iconv(s:visualstudio_temp_result, 'cp932', &encoding)
+    let l:temp = iconv(s:visualstudio_temp_result, g:visualstudio_terminalencoding, &encoding)
     exe 'e '.l:temp
 endfunction
 
@@ -236,7 +233,7 @@ function! s:visualstudio_save_find_result(findType)
         let l:cmd = s:visualstudio_make_command("getfindresult2", "-t", currentfilefullpath)
     endif
     let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
-    let l:temp = iconv(s:visualstudio_temp_result, 'cp932', &encoding)
+    let l:temp = iconv(s:visualstudio_temp_result, g:visualstudio_terminalencoding, &encoding)
     let l:value = split(l:temp, "\n")
     call writefile(l:value, g:visualstudio_findresultfilepath)
 endfunction
@@ -256,7 +253,7 @@ function! s:visualstudio_save_output(target)
     let l:currentfilefullpath = a:target == "" ? s:visualstudio_get_current_buffer_fullpath() : a:target
     let l:cmd = s:visualstudio_make_command("getoutput", "-t", l:currentfilefullpath)
     let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
-    let l:temp = iconv(s:visualstudio_temp_result, 'cp932', &encoding)
+    let l:temp = iconv(s:visualstudio_temp_result, g:visualstudio_terminalencoding, &encoding)
     let l:value = split(l:temp, "\n")
     call writefile(l:value, g:visualstudio_outputfilepath)
 endfunction
@@ -265,15 +262,15 @@ function! s:visualstudio_save_error_list(target)
     let l:currentfilefullpath = a:target == "" ? s:visualstudio_get_current_buffer_fullpath() : a:target
     let l:cmd = s:visualstudio_make_command("geterrorlist", "-t", l:currentfilefullpath)
     let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
-    let l:temp = iconv(s:visualstudio_temp_result, 'cp932', &encoding)
+    let l:temp = iconv(s:visualstudio_temp_result, g:visualstudio_terminalencoding, &encoding)
     let l:value = split(l:temp, "\n")
     call writefile(l:value, g:visualstudio_errorlistfilepath)
 endfunction
 
-function! visualstudio#open_output(target)
+function! visualstudio#open_output(...)
     "またないと正確に値が取れない時がある...orz
     sleep 500m
-    :call s:visualstudio_save_output(a:target)
+    :call s:visualstudio_save_output(a:0 ? a:0 : "")
     let &errorformat = g:visualstudio_errorformat
     exe 'copen '.g:visualstudio_quickfixheight
     exe 'cfile '.g:visualstudio_outputfilepath
@@ -282,9 +279,9 @@ function! visualstudio#open_output(target)
     endif
 endfunction
 
-function! visualstudio#open_error_list(target)
+function! visualstudio#open_error_list(...)
     sleep 500m
-    :call s:visualstudio_save_error_list(a:target)
+    :call s:visualstudio_save_error_list(a:0 ? a:0 : "")
     let &errorformat = g:visualstudio_errorlistformat
     exe 'copen '.g:visualstudio_quickfixheight
     exe 'cfile '.g:visualstudio_errorlistfilepath
@@ -298,6 +295,14 @@ function! visualstudio#add_break_point()
     let linenum = line(".")
     let l:cmd = s:visualstudio_make_command("addbreakpoint", "-t", currentfilefullpath, "-f", currentfilefullpath, "-line", linenum)
     let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
+endfunction
+
+
+function! visualstudio#set_build_config()
+
+endfunction
+
+function! visualstudio#set_build_platform()
 endfunction
 
 "}}}

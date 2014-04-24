@@ -52,6 +52,8 @@ let g:visualstudio_enablevimproc =
 let g:visualstudio_updatetime =
       \ get(g:, 'visualstudio_updatetime', 2000)
 
+let g:visualstudio_terminalencoding =
+      \ get(g:, 'visualstudio_terminalencoding', 'cp932')
 "}}}
 
 " vim-visualstudio functions {{{
@@ -65,8 +67,13 @@ command! VSBuildNoWait call visualstudio#build_solution("build", "")
 command! VSReBuildNoWait call visualstudio#build_solution("rebuild", "")
 "}}}
 
+"build config {{{
+command! VSSetBuildConfig call visualstudio#set_build_config()
+command! VSSetPlatform call visualstudio#set_build_platform()
+"}}}
+
 "cancel{{{
-command! VSCancelBuild call visualstudio#cancel_build("")
+command! -nargs=? VSCancelBuild call visualstudio#cancel_build(<f-args>)
 "}}}
 
 " run {{{
@@ -91,8 +98,8 @@ command! -nargs=? VSGetFile call visualstudio#get_current_file(<f-args>)
 
 
 "other {{{
-command! VSOutput call visualstudio#open_output("")
-command! VSErorrList call visualstudio#open_error_list("")
+command! -nargs=? VSOutput call visualstudio#open_output(<f-args>)
+command! -nargs=? VSErorrList call visualstudio#open_error_list(<f-args>)
 command! VSAddBreakPoint call visualstudio#add_break_point()
 "}}}
 
