@@ -62,11 +62,8 @@ endfunction
 
 function! s:visualstudio_convert_encoding(targetString)
     if g:visualstudio_terminalencoding != "utf-8"
-        echo "変換"
         return iconv(a:targetString, g:visualstudio_terminalencoding, &encoding)
     endif
-    echo "変換なし"
-    echo a:targetString
     return a:targetString
 endfunction
 
@@ -262,9 +259,7 @@ endfunction
 function! s:visualstudio_save_output(target)
     let l:currentfilefullpath = a:target == "" ? s:visualstudio_get_current_buffer_fullpath() : a:target
     let l:cmd = s:visualstudio_make_command("getoutput", "-t", l:currentfilefullpath)
-    echo l:cmd
     let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
-    echo s:visualstudio_temp_result
     let l:temp = s:visualstudio_convert_encoding(s:visualstudio_temp_result)
     let l:value = split(l:temp, "\n")
     call writefile(l:value, g:visualstudio_outputfilepath)
