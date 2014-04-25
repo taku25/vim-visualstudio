@@ -60,6 +60,16 @@ function! s:visualstudio_get_current_buffer_fullpath()
     return l:currentfilefullpath
 endfunction
 
+function! s:visualstudio_convert_encoding(targetString)
+    if g:visualstudio_terminalencoding != "utf-8"
+        echo "変換"
+        return iconv(a:targetString, g:visualstudio_terminalencoding, &encoding)
+    endif
+    echo "変換なし"
+    echo a:targetString
+    return a:targetString
+endfunction
+
 
 function! s:visualstudio_make_command(command, ...)
     let l:arglist = []
@@ -71,9 +81,9 @@ function! s:visualstudio_make_command(command, ...)
             let l:arglist += [shellescape(funargs)]
         endif
     endfor
-    let l:nativeargs = join(l:arglist, ' ')
 
-    let l:result = shellescape(expand(g:visualstudio_controllerpath)) . " " . a:command . " " . l:nativeargs
+    let l:nativeargs = join(l:arglist, ' ')
+    let l:result = shellescape(expand(g:visualstudio_controllerpath)) . " " . a:command . " " . l:nativeargs . " -oe utf8"
 
     return substitute(l:result, "\\", "/", "g")
 endfunction
@@ -124,7 +134,7 @@ function! visualstudio#build_solution(buildtype, wait)
                 "{
                     let l:tempcmd = s:visualstudio_make_command("getsolutionfullpath", "-t", l:currentfilefullpath)
                     let l:temp_result = s:visualstudio_system(l:tempcmd)
-                    let l:solutionfullpath = iconv(l:temp_result, g:visualstudio_terminalencoding, &encoding)
+                    let l:solutionfullpath = s:visualstudio_convert_encoding(l:temp_result)
                     let l:solutionfullpath = s:vital_datastring.chop(l:solutionfullpath)        
                     if s:visualstudio_last_build_solution_fullpath == l:solutionfullpath
                         "同じsolutionをビルドなら前のを消しておく
@@ -164,7 +174,7 @@ endfunction
                     
 function! s:visualstudio_check_finished()
     let l:cmd = s:visualstudio_make_command("getbuildstatus", "-t", s:visualstudio_last_build_solution_fullpath)
-    let l:status = iconv(s:visualstudio_system(l:cmd), g:visualstudio_terminalencoding, &encoding)
+    let l:status = s:visualstudio_convert_encoding(s:visualstudio_system(l:cmd))
     if l:status != "InProgress"
         "もどし
         let &updatetime = s:visualstudio_global_update_time
@@ -203,7 +213,7 @@ function! visualstudio#get_current_file(...)
     endif
     
     let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
-    let l:temp = iconv(s:visualstudio_temp_result, g:visualstudio_terminalencoding, &encoding)
+    let l:temp = s:visualstudio_convert_encoding(s:visualstudio_temp_result)
     exe 'e '.l:temp
 endfunction
 
@@ -233,7 +243,7 @@ function! s:visualstudio_save_find_result(findType)
         let l:cmd = s:visualstudio_make_command("getfindresult2", "-t", currentfilefullpath)
     endif
     let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
-    let l:temp = iconv(s:visualstudio_temp_result, g:visualstudio_terminalencoding, &encoding)
+    let l:temp = s:visualstudio_convert_encoding(s:visualstudio_temp_result)
     let l:value = split(l:temp, "\n")
     call writefile(l:value, g:visualstudio_findresultfilepath)
 endfunction
@@ -252,8 +262,10 @@ endfunction
 function! s:visualstudio_save_output(target)
     let l:currentfilefullpath = a:target == "" ? s:visualstudio_get_current_buffer_fullpath() : a:target
     let l:cmd = s:visualstudio_make_command("getoutput", "-t", l:currentfilefullpath)
+    echo l:cmd
     let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
-    let l:temp = iconv(s:visualstudio_temp_result, g:visualstudio_terminalencoding, &encoding)
+    echo s:visualstudio_temp_result
+    let l:temp = s:visualstudio_convert_encoding(s:visualstudio_temp_result)
     let l:value = split(l:temp, "\n")
     call writefile(l:value, g:visualstudio_outputfilepath)
 endfunction
@@ -262,7 +274,7 @@ function! s:visualstudio_save_error_list(target)
     let l:currentfilefullpath = a:target == "" ? s:visualstudio_get_current_buffer_fullpath() : a:target
     let l:cmd = s:visualstudio_make_command("geterrorlist", "-t", l:currentfilefullpath)
     let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
-    let l:temp = iconv(s:visualstudio_temp_result, g:visualstudio_terminalencoding, &encoding)
+    let l:temp = s:visualstudio_convert_encoding(s:visualstudio_temp_result)
     let l:value = split(l:temp, "\n")
     call writefile(l:value, g:visualstudio_errorlistfilepath)
 endfunction
@@ -270,7 +282,7 @@ endfunction
 function! visualstudio#open_output(...)
     "またないと正確に値が取れない時がある...orz
     sleep 500m
-    :call s:visualstudio_save_output(a:0 ? a:0 : "")
+    :call s:visualstudio_save_output(a:0 ? a:1 : "")
     let &errorformat = g:visualstudio_errorformat
     exe 'copen '.g:visualstudio_quickfixheight
     exe 'cfile '.g:visualstudio_outputfilepath
@@ -281,7 +293,7 @@ endfunction
 
 function! visualstudio#open_error_list(...)
     sleep 500m
-    :call s:visualstudio_save_error_list(a:0 ? a:0 : "")
+    :call s:visualstudio_save_error_list(a:0 ? a:1 : "")
     let &errorformat = g:visualstudio_errorlistformat
     exe 'copen '.g:visualstudio_quickfixheight
     exe 'cfile '.g:visualstudio_errorlistfilepath

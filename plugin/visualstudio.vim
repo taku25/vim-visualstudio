@@ -53,7 +53,7 @@ let g:visualstudio_updatetime =
       \ get(g:, 'visualstudio_updatetime', 2000)
 
 let g:visualstudio_terminalencoding =
-      \ get(g:, 'visualstudio_terminalencoding', 'cp932')
+      \ get(g:, 'visualstudio_terminalencoding', 'utf-8')
 "}}}
 
 " vim-visualstudio functions {{{
