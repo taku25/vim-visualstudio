@@ -32,6 +32,9 @@ winextention周りで32 & 64bitなどの問題が発生してしまう可能性�
  * パスが通っているディレクトリかg:visualstudio_controllerpathでフルパス指定  
  * https://github.com/taku25/VisualStudioController  
 * vimprocがインストールされている場合デフォルトでは自動的にvimprocを使用します
+* VisuaslStudio2005以上
+       **quickfixを使用してエラー個所などにジャンプする場合は VisualStudioのプロジェクト設定で/FCオプションを使用してください**
+       **http://msdn.microsoft.com/ja-jp/library/027c4t2s.aspx**
 
 ##インストール
 * NeoBundle 'taku25/vim-visualstudio'  
@@ -95,14 +98,14 @@ Vimで編集中のファイルを含むVisualStudioがビルド中であれば�
 Vimで編集中のファイルを含むVisualStudioで作成済みの実行ファイルを起動します
 
 * VSErorrList  
-Vimで編集中のファイルを含むVisualStudioのエラー一覧をqickfixに表示します
+Vimで編集中のファイルを含むVisualStudioのエラー一覧をquickfixに表示します
 
 * VSOutput  
-Vimで編集中のファイルを含むVisualStudioの出力をqickfixに表示します
+Vimで編集中のファイルを含むVisualStudioの出力をquickfixに表示します
 
 * VSFindResult1  
-Vimで編集中のファイルを含むVisualStudioの検索結果1をqickfixに表示します
+Vimで編集中のファイルを含むVisualStudioの検索結果1をquickfixに表示します
 
 * VSFindResult1  
-Vimで編集中のファイルを含むVisualStudioの検索結果1をqickfixに表示します
+Vimで編集中のファイルを含むVisualStudioの検索結果1をquickfixに表示します
 
