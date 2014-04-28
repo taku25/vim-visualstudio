@@ -303,13 +303,51 @@ function! visualstudio#add_break_point()
     let l:cmd = s:visualstudio_make_command("addbreakpoint", "-t", currentfilefullpath, "-f", currentfilefullpath, "-line", linenum)
     let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
 endfunction
+"}}}
 
+"build config {{{
 
-function! visualstudio#set_build_config()
+function! visualstudio#set_build_config(...)
+    let l:target = a:0 ? a:1 : s:visualstudio_get_current_buffer_fullpath()
+    let l:cmd = s:visualstudio_make_command("getbuildconfiglist", "-t", l:target)
+    let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
+    let l:temp = s:visualstudio_convert_encoding(s:visualstudio_temp_result)
+    let l:configlist = s:vital_datastring.lines(l:temp)
+    let l:displaylist = []
+    let l:i = 0
+    for l:config in l:configlist
+        :call add(l:displaylist, (l:i + 1) . '.' . l:config)
+        let l:i+=1
+    endfor
+
+    let l:inputnumber = inputlist(l:displaylist) - 1
+    if l:inputnumber < 0 || l:inputnumber > len(l:displaylist)
+        return 
+    endif
+    let l:cmd = s:visualstudio_make_command("setcurrentbuildconfig", "-t", l:target, "-buildconfig", l:configlist[l:inputnumber] )
+    let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
 
 endfunction
 
-function! visualstudio#set_build_platform()
+function! visualstudio#set_build_platform(...)
+    let l:target = a:0 ? a:1 : s:visualstudio_get_current_buffer_fullpath()
+    let l:cmd = s:visualstudio_make_command("getplatformlist", "-t", l:target)
+    let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
+    let l:temp = s:visualstudio_convert_encoding(s:visualstudio_temp_result)
+    let l:platformlist = s:vital_datastring.lines(l:temp)
+    let l:displaylist = []
+    let l:i = 0
+    for l:platform in l:platformlist
+        :call add(l:displaylist, (l:i + 1) . '.' . l:platform)
+        let l:i+=1
+    endfor
+
+    let l:inputnumber = inputlist(l:displaylist) - 1
+    if l:inputnumber < 0 || l:inputnumber > len(l:displaylist)
+        return 
+    endif
+    let l:cmd = s:visualstudio_make_command("setcurrentbuildconfig", "-t", l:target, "-platform", l:platformlist[l:inputnumber] )
+    let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
 endfunction
 
 "}}}

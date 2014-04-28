@@ -68,8 +68,8 @@ command! VSReBuildNoWait call visualstudio#build_solution("rebuild", "")
 "}}}
 
 "build config {{{
-command! VSSetBuildConfig call visualstudio#set_build_config()
-command! VSSetPlatform call visualstudio#set_build_platform()
+command! -nargs=? VSSetBuildConfig call visualstudio#set_build_config(<f-args>)
+command! -nargs=? VSSetPlatform call visualstudio#set_build_platform(<f-args>)
 "}}}
 
 "cancel{{{
