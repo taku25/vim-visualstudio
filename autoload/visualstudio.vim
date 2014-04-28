@@ -107,7 +107,7 @@ function! s:visualstudio_seterrortype()
     :call setqflist(l:dic)
 endfunction
 
-"" compile & build "{{{
+" compile & build "{{{
 function! visualstudio#build_solution(buildtype, wait)
     let l:currentfilefullpath = s:visualstudio_get_current_buffer_fullpath()
     let l:cmd = s:visualstudio_make_command(a:buildtype, "-t", l:currentfilefullpath, a:wait)
@@ -232,7 +232,7 @@ function! visualstudio#run(runType)
 endfunction
 "}}}
 
-"" find {{{
+"find {{{
 function! s:visualstudio_save_find_result(findType)
     let currentfilefullpath = s:visualstudio_get_current_buffer_fullpath()
     let l:cmd = s:visualstudio_make_command("getfindresult1", "-t", currentfilefullpath)
@@ -303,6 +303,15 @@ function! visualstudio#add_break_point()
     let l:cmd = s:visualstudio_make_command("addbreakpoint", "-t", currentfilefullpath, "-f", currentfilefullpath, "-line", linenum)
     let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
 endfunction
+
+function! visualstudio#change_solution_directory(...)
+    let l:target = a:0 ? a:1 : s:visualstudio_get_current_buffer_fullpath()
+    let l:cmd = s:visualstudio_make_command("getsolutiondirectory", "-t", l:target)
+    let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
+    let s:visualstudio_temp_result = iconv(s:visualstudio_temp_result, g:visualstudio_terminalencoding, &encoding)
+    let s:visualstudio_temp_result = s:vital_datastring.chop(s:visualstudio_temp_result)        
+    echo 'cd '.shellescape(s:visualstudio_temp_result)
+endfunction
 "}}}
 
 "build config {{{
@@ -351,6 +360,7 @@ function! visualstudio#set_build_platform(...)
 endfunction
 
 "}}}
+
 
 " Restore 'cpoptions' {{{
 let &cpo = s:save_cpo

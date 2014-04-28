@@ -101,7 +101,9 @@ command! -nargs=? VSGetFile call visualstudio#get_current_file(<f-args>)
 command! -nargs=? VSOutput call visualstudio#open_output(<f-args>)
 command! -nargs=? VSErorrList call visualstudio#open_error_list(<f-args>)
 command! VSAddBreakPoint call visualstudio#add_break_point()
+command! -nargs=? VSChangeSolutionDirectory call visualstudio#change_solution_directory(<f-args>)
 "}}}
+
 
 
 "}}} endfuc
