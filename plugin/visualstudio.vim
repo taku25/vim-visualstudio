@@ -58,37 +58,63 @@ let g:visualstudio_terminalencoding =
 
 " vim-visualstudio functions {{{
 
-"compile & build {{{
+" build {{{
 command! VSCompile call visualstudio#compile_file("-w")
-command! VSCompileNoWait call visualstudio#compile_file("")
 command! VSBuild call visualstudio#build_solution("build", "-w")
 command! VSReBuild call visualstudio#build_solution("rebuild", "-w")
+
+command! VSCompileNoWait call visualstudio#compile_file("")
 command! VSBuildNoWait call visualstudio#build_solution("build", "")
 command! VSReBuildNoWait call visualstudio#build_solution("rebuild", "")
-"}}}
 
-"build config {{{
+" config {{{
 command! -nargs=? VSSetBuildConfig call visualstudio#set_build_config(<f-args>)
 command! -nargs=? VSSetPlatform call visualstudio#set_build_platform(<f-args>)
-"}}}
+" }}}
 
-"cancel{{{
+" cancel {{{
 command! -nargs=? VSCancelBuild call visualstudio#cancel_build(<f-args>)
-"}}}
-
-" run {{{
-command! VSRun call visualstudio#run(0)
-command! VSDebugRun call visualstudio#run(1)
-"}}}
-
+" }}}
 
 " clean {{{
-command! VSClean call visualstudio#clean_solution()
+command! -nargs=? VSClean call visualstudio#clean_solution(<f-args>)
 "}}}
 
+" result  {{{
+command! -nargs=? VSOutput call visualstudio#open_output(<f-args>)
+command! -nargs=? VSErorrList call visualstudio#open_error_list(<f-args>)
+"}}}
+
+" }}}
+
+
+" run {{{
+command! -nargs=? VSRun call visualstudio#run(0, <f-args>)
+command! -nargs=? VSDebugRun call visualstudio#run(1, <f-args>)
+"}}}
+
+
 "find {{{
-command! VSFindResult1 call visualstudio#open_find_result(0)
-command! VSFindResult2 call visualstudio#open_find_result(1)
+
+" solution {{{
+command! -nargs=+ VSFindSolution1 call visualstudio#find("solution", "one", "-w", <f-args>)
+command! -nargs=+ VSFindSolution2 call visualstudio#find("solution", "two", "-w", <f-args>)
+command! -nargs=+ VSFindSolutionNoWait1 call visualstudio#find("solution", "one", "", <f-args>)
+command! -nargs=+ VSFindSolutionNoWait2 call visualstudio#find("solution", "two", "", <f-args>)
+"}}}
+
+" project {{{
+command! -nargs=+ VSFindProject1 call visualstudio#find("project", "one", "-w", <f-args>)
+command! -nargs=+ VSFindProject2 call visualstudio#find("project", "two", "-w", <f-args>)
+command! -nargs=+ VSFindProjectNoWait1 call visualstudio#find("project", "one", "", <f-args>)
+command! -nargs=+ VSFindProjectNoWait2 call visualstudio#find("project", "two", "", <f-args>)
+"}}}
+
+" result  {{{
+command! -nargs=? VSFindResult1 call visualstudio#open_find_result(0, <f-args>)
+command! -nargs=? VSFindResult2 call visualstudio#open_find_result(1, <f-args>)
+"}}}
+
 "}}}
 
 " open & get file {{{
@@ -98,12 +124,9 @@ command! -nargs=? VSGetFile call visualstudio#get_current_file(<f-args>)
 
 
 "other {{{
-command! -nargs=? VSOutput call visualstudio#open_output(<f-args>)
-command! -nargs=? VSErorrList call visualstudio#open_error_list(<f-args>)
 command! VSAddBreakPoint call visualstudio#add_break_point()
 command! -nargs=? VSChangeSolutionDirectory call visualstudio#change_solution_directory(<f-args>)
 "}}}
-
 
 
 "}}} endfuc

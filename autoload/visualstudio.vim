@@ -14,10 +14,12 @@ let s:vital_datastring = s:vital.import('Data.String')
 augroup plugin-visualstudio
 augroup END
 
+
 " local variable.  " {{{1
 let s:visualstudio_temp_result =""
 let s:visualstudio_install_vimproc = 0
-let s:visualstudio_last_build_solution_fullpath = ""
+let s:visualstudio_last_target_solution_fullpath = ""
+let s:visualstudio_last_find_result_location = ""
 let s:visualstudio_global_update_time = &updatetime
 "}}}
 
@@ -107,6 +109,34 @@ function! s:visualstudio_seterrortype()
     :call setqflist(l:dic)
 endfunction
 
+function! s:visualstudio_clear_process_and_augroup()
+    let &updatetime = s:visualstudio_global_update_time
+    augroup plugin-visualstudio
+        autocmd! 
+    augroup END
+    try
+        call s:vital_processmanager.kill("visualstudio")
+    catch
+    endtry
+endfunction
+
+function! s:visualstudio_check_finished(checkType)
+    let l:status = s:vital_processmanager.status("visualstudio")
+    if  l:status == 'inactive'
+        call s:visualstudio_clear_process_and_augroup()
+
+        if a:checkType == "build"
+            call visualstudio#open_output(shellescape(s:visualstudio_last_target_solution_fullpath))
+        elseif a:checkType == "find"
+            call visualstudio#open_find_result(s:visualstudio_last_find_result_location == "one" ? 0 : 1, shellescape(s:visualstudio_last_target_solution_fullpath))
+        endif
+        
+        let s:visualstudio_last_target_solution_fullpath = "" 
+        let s:visualstudio_last_find_result_location = "" 
+    endif
+endfunction
+
+
 " compile & build "{{{
 function! visualstudio#build_solution(buildtype, wait)
     let l:currentfilefullpath = s:visualstudio_get_current_buffer_fullpath()
@@ -128,32 +158,20 @@ function! visualstudio#build_solution(buildtype, wait)
             else
                 "waitなし かつ vimprocが使用できる かつ　自動表示時のみ
                 "processmanagerを使用する
-                "{
-                    let l:tempcmd = s:visualstudio_make_command("getsolutionfullpath", "-t", l:currentfilefullpath)
-                    let l:temp_result = s:visualstudio_system(l:tempcmd)
-                    let l:solutionfullpath = s:visualstudio_convert_encoding(l:temp_result)
-                    let l:solutionfullpath = s:vital_datastring.chop(l:solutionfullpath)        
-                    if s:visualstudio_last_build_solution_fullpath == l:solutionfullpath
-                        "同じsolutionをビルドなら前のを消しておく
-                        call visualstudio#cancel_build(l:solutionfullpath)
-                        let &updatetime = s:visualstudio_global_update_time
-                        augroup plugin-visualstudio
-                            autocmd! 
-                        augroup END
-                        try
-                            s:vital_processmanager.kill("visualstudio_build")
-                        catch
-                        endtry
-                    endif
-                    let s:visualstudio_last_build_solution_fullpath = l:solutionfullpath
-                "}
-                "起動
-                call s:vital_processmanager.touch("visualstudio_build", l:cmd)
+                let l:tempcmd = s:visualstudio_make_command("getsolutionfullpath", "-t", l:currentfilefullpath)
+                let l:temp_result = s:visualstudio_system(l:tempcmd)
+                let l:solutionfullpath = s:vital_datastring.chop(s:visualstudio_convert_encoding(l:temp_result))
+                if s:visualstudio_last_target_solution_fullpath == l:solutionfullpath
+                    "同じsolutionをビルドなら前のを消しておく
+                    call visualstudio#cancel_build(l:solutionfullpath)
+                    call s:visualstudio_clear_process_and_augroup()
+                endif
+                let s:visualstudio_last_target_solution_fullpath = l:solutionfullpath
+                "プロセス監視のため起動waitをつけて起動する
+                call s:vital_processmanager.touch("visualstudio", l:cmd . " -w")
                 let &updatetime = g:visualstudio_updatetime
-                "ちょっとまち
-                sleep 500m
                 augroup plugin-visualstudio
-                    execute 'autocmd! CursorHold,CursorHoldI * call' 's:visualstudio_check_finished()'
+                    execute 'autocmd! CursorHold,CursorHoldI * call' 's:visualstudio_check_finished("build")'
                 augroup END
             endif
         endif
@@ -169,38 +187,25 @@ function! visualstudio#compile_file(wait)
     endif
 endfunction
                     
-function! s:visualstudio_check_finished()
-    let l:cmd = s:visualstudio_make_command("getbuildstatus", "-t", s:visualstudio_last_build_solution_fullpath)
-    let l:status = s:visualstudio_convert_encoding(s:visualstudio_system(l:cmd))
-    if l:status != "InProgress"
-        "もどし
-        let &updatetime = s:visualstudio_global_update_time
-        augroup plugin-visualstudio
-            autocmd! 
-        augroup END
-        call s:vital_processmanager.kill("visualstudio_build")
-        call visualstudio#open_output(shellescape(s:visualstudio_last_build_solution_fullpath))
-    endif
-endfunction
 
-"}}}
-
-
-" build cancel {{{
+"  cancel {{{
 function! visualstudio#cancel_build(...)
-    let l:currentfilefullpath = a:0 ? a:0 : s:visualstudio_get_current_buffer_fullpath() 
+    let l:currentfilefullpath = a:0 ? a:1 : s:visualstudio_get_current_buffer_fullpath() 
     let l:cmd = s:visualstudio_make_command("cancelbuild", "-t", l:currentfilefullpath)
     let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
 endfunction
 "}}}
 
 " clean {{{
-function! visualstudio#clean_solution()
-    let currentfilefullpath = s:visualstudio_get_current_buffer_fullpath()
-    let l:cmd = s:visualstudio_make_command("clean", "-t", currentfilefullpath )
+function! visualstudio#clean_solution(...)
+    let l:currentfilefullpath = a:0 ? a:1 : s:visualstudio_get_current_buffer_fullpath() 
+    let l:cmd = s:visualstudio_make_command("clean", "-t", l:currentfilefullpath )
     let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
 endfunction
 "}}}
+"}}}
+
+
 
 " open & get file {{{
 function! visualstudio#get_current_file(...)
@@ -222,31 +227,78 @@ endfunction
 "}}}
 
 " run {{{
-function! visualstudio#run(runType)
-    let currentfilefullpath = s:visualstudio_get_current_buffer_fullpath()
-    let l:cmd = s:visualstudio_make_command("run", "-t", currentfilefullpath)
+function! visualstudio#run(runType, ...)
+    let l:currentfilefullpath = a:0 ? a:1 : s:visualstudio_get_current_buffer_fullpath()
+    let l:cmd = s:visualstudio_make_command("run", "-t", l:currentfilefullpath)
     if a:runType == 1
-        let l:cmd = s:visualstudio_make_command("debugrun", "-t", currentfilefullpath)
+        let l:cmd = s:visualstudio_make_command("debugrun", "-t", l:currentfilefullpath)
     endif
     let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
 endfunction
 "}}}
 
 "find {{{
-function! s:visualstudio_save_find_result(findType)
-    let currentfilefullpath = s:visualstudio_get_current_buffer_fullpath()
-    let l:cmd = s:visualstudio_make_command("getfindresult1", "-t", currentfilefullpath)
-    if a:findType == 1
-        let l:cmd = s:visualstudio_make_command("getfindresult2", "-t", currentfilefullpath)
+function! visualstudio#find(findTarget, resultLocationType, wait, ...)
+    if a:0 == 0
+        echo "Please set a search word"
+        return
     endif
+    
+    let l:target = a:0 == 2 ? a:2 : s:visualstudio_get_current_buffer_fullpath()
+    let l:cmd = s:visualstudio_make_command("find", "-t", l:target,
+                                            \ "-fw", a:1,
+                                            \ a:wait,
+                                            \ "-fl", a:resultLocationType,
+                                            \ "-ft", a:findTarget)
+
+    if a:wait == "-w"
+        let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
+        if g:visualstudio_showautooutput == 1
+            call visualstudio#open_find_result(a:resultLocationType == "one" ? 0 : 1, l:target)
+        endif
+    else
+
+        let l:enableVimproc = s:visualstudio_enable_vimproc()
+        "waitなしでvimprocが使えない時は自動表示はしない
+        if l:enableVimproc == 0
+            let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
+        else
+            if g:visualstudio_showautooutput == 0
+                let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
+            else
+                "waitなし かつ vimprocが使用できる かつ　自動表示時のみ
+                "processmanagerを使用する
+                let l:tempcmd = s:visualstudio_make_command("getsolutionfullpath", "-t", l:target)
+                let l:temp_result = s:visualstudio_system(l:tempcmd)
+                let l:solutionfullpath = s:vital_datastring.chop(s:visualstudio_convert_encoding(l:temp_result))
+                if s:visualstudio_last_target_solution_fullpath == l:solutionfullpath
+                    call s:visualstudio_clear_process_and_augroup()
+                endif
+                let s:visualstudio_last_target_solution_fullpath = l:solutionfullpath
+                let s:visualstudio_last_find_result_location = a:resultLocationType
+                "起動
+                call s:vital_processmanager.touch("visualstudio", l:cmd . " -w")
+                let &updatetime = g:visualstudio_updatetime
+                augroup plugin-visualstudio
+                    execute 'autocmd! CursorHold,CursorHoldI * call' 's:visualstudio_check_finished("find")'
+                augroup END
+            endif
+        endif
+    endif
+endfunction
+
+
+function! s:visualstudio_save_find_result(findType, target)
+    let l:currentfilefullpath = a:target != "" ? a:target : s:visualstudio_get_current_buffer_fullpath()
+    let l:cmd = s:visualstudio_make_command(a:findType == 0 ? "getfindresult1" : "getfindresult2", "-t", l:currentfilefullpath)
     let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
     let l:temp = s:visualstudio_convert_encoding(s:visualstudio_temp_result)
     let l:value = split(l:temp, "\n")
     call writefile(l:value, g:visualstudio_findresultfilepath)
 endfunction
 
-function! visualstudio#open_find_result(findType)
-    :call s:visualstudio_save_find_result(a:findType)
+function! visualstudio#open_find_result(findType, ...)
+    :call s:visualstudio_save_find_result(a:findType, a:0 ? a:1 : "")
     exe 'copen '.g:visualstudio_quickfixheight
     exe 'setlocal errorformat='.g:visualstudio_findformat
     exe 'cfile '.g:visualstudio_findresultfilepath
