@@ -360,9 +360,18 @@ function! visualstudio#change_solution_directory(...)
     let l:target = a:0 ? a:1 : s:visualstudio_get_current_buffer_fullpath()
     let l:cmd = s:visualstudio_make_command("getsolutiondirectory", "-t", l:target)
     let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
-    let s:visualstudio_temp_result = iconv(s:visualstudio_temp_result, g:visualstudio_terminalencoding, &encoding)
+    let s:visualstudio_temp_result = s:visualstudio_convert_encoding(s:visualstudio_temp_result)
     let s:visualstudio_temp_result = s:vital_datastring.chop(s:visualstudio_temp_result)        
     echo 'cd '.shellescape(s:visualstudio_temp_result)
+endfunction
+
+function! visualstudio#get_all_files(...)
+    let l:target = a:0 ? a:1 : s:visualstudio_get_current_buffer_fullpath()
+    let l:cmd = s:visualstudio_make_command("getallfiles", "-t", l:target)
+    let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
+    let s:visualstudio_temp_result = s:visualstudio_convert_encoding(s:visualstudio_temp_result)
+    let l:temp = s:vital_datastring.lines(s:visualstudio_temp_result)
+    return l:temp
 endfunction
 "}}}
 
