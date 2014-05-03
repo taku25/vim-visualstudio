@@ -420,6 +420,26 @@ function! visualstudio#set_build_platform(...)
     let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
 endfunction
 
+function! visualstudio#set_startup_project(...)
+    let l:target = a:0 ? a:1 : s:visualstudio_get_current_buffer_fullpath()
+    let l:cmd = s:visualstudio_make_command("getprojectlist", "-t", l:target)
+    let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
+    let l:temp = s:visualstudio_convert_encoding(s:visualstudio_temp_result)
+    let l:projectlist = s:vital_datastring.lines(l:temp)
+    let l:displaylist = []
+    let l:i = 0
+    for l:project in l:projectlist
+        :call add(l:displaylist, (l:i + 1) . '.' . l:project)
+        let l:i+=1
+    endfor
+
+    let l:inputnumber = inputlist(l:displaylist) - 1
+    if l:inputnumber < 0 || l:inputnumber > len(l:displaylist)
+        return 
+    endif
+    let l:cmd = s:visualstudio_make_command("setstartupproject", "-t", l:target, "-p", l:projectlist[l:inputnumber] )
+    let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
+endfunction
 "}}}
 
 

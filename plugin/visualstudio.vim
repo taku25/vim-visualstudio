@@ -91,6 +91,7 @@ command! -nargs=? VSErorrList call visualstudio#open_error_list(<f-args>)
 " run {{{
 command! -nargs=? VSRun call visualstudio#run(0, <f-args>)
 command! -nargs=? VSDebugRun call visualstudio#run(1, <f-args>)
+command! -nargs=? VSSetStartUpProject call visualstudio#set_startup_project(<f-args>)
 "}}}
 
 
