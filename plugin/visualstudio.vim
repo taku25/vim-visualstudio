@@ -35,7 +35,7 @@ let g:visualstudio_errorformat =
       \ get(g:, 'visualstudio_errorformat', '%.\*>%f\(%l\):\ %m')
 
 let g:visualstudio_errorlistformat =
-      \ get(g:, 'visualstudio_errorlistformat', '%f\ \(%l\):\ %m')
+      \ get(g:, 'visualstudio_errorlistformat', '%f\ \(%l\,%c\):\ %m')
 
 let g:visualstudio_findformat =
       \ get(g:, 'visualstudio_findformat', '%f\(%l\):%m')

@@ -420,6 +420,8 @@ function! visualstudio#set_build_platform(...)
     let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
 endfunction
 
+"}}}
+
 function! visualstudio#set_startup_project(...)
     let l:target = a:0 ? a:1 : s:visualstudio_get_current_buffer_fullpath()
     let l:cmd = s:visualstudio_make_command("getprojectlist", "-t", l:target)
@@ -440,8 +442,6 @@ function! visualstudio#set_startup_project(...)
     let l:cmd = s:visualstudio_make_command("setstartupproject", "-t", l:target, "-p", l:projectlist[l:inputnumber] )
     let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
 endfunction
-"}}}
-
 
 " Restore 'cpoptions' {{{
 let &cpo = s:save_cpo
