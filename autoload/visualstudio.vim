@@ -43,11 +43,14 @@ endfunction
 function! s:visualstudio_system(command)
     let l:enableVimproc = s:visualstudio_enable_vimproc()
 
+    let l:result = ""
     if l:enableVimproc == 1
-        return vimproc#system(a:command)
+        let l:result = vimproc#system(a:command)
+    else
+        let l:result = system(a:command)
     endif
 
-    return system(a:command)
+    return s:visualstudio_convert_encoding(l:result)
 endfunction
 
 
@@ -125,6 +128,7 @@ function! s:visualstudio_check_finished(checkType)
     if  l:status == 'inactive'
         call s:visualstudio_clear_process_and_augroup()
 
+        echo "check"
         if a:checkType == "build"
             call visualstudio#open_output(shellescape(s:visualstudio_last_target_solution_fullpath))
         elseif a:checkType == "find"
@@ -136,8 +140,20 @@ function! s:visualstudio_check_finished(checkType)
     endif
 endfunction
 
+function! s:visualstudio_make_user_select_list(targetlist)
+    let displaylist = []
+    let l:i = 0
+    for l:target in a:targetlist
+        :call add(displaylist, (l:i + 1) . '.' . l:target)
+        let l:i+=1
+    endfor
+    return displaylist
+endfunction
+
 
 " compile & build "{{{
+
+" build {{{
 function! visualstudio#build_solution(buildtype, wait)
     let l:currentfilefullpath = s:visualstudio_get_current_buffer_fullpath()
     let l:cmd = s:visualstudio_make_command(a:buildtype, "-t", l:currentfilefullpath, a:wait)
@@ -159,8 +175,7 @@ function! visualstudio#build_solution(buildtype, wait)
                 "waitなし かつ vimprocが使用できる かつ　自動表示時のみ
                 "processmanagerを使用する
                 let l:tempcmd = s:visualstudio_make_command("getsolutionfullpath", "-t", l:currentfilefullpath)
-                let l:temp_result = s:visualstudio_system(l:tempcmd)
-                let l:solutionfullpath = s:vital_datastring.chop(s:visualstudio_convert_encoding(l:temp_result))
+                let l:solutionfullpath = s:vital_datastring.chop(s:visualstudio_system(l:tempcmd))
                 if s:visualstudio_last_target_solution_fullpath == l:solutionfullpath
                     "同じsolutionをビルドなら前のを消しておく
                     call visualstudio#cancel_build(l:solutionfullpath)
@@ -185,8 +200,8 @@ function! visualstudio#compile_file(wait)
     if a:wait != "" && g:visualstudio_showautooutput==1
         call visualstudio#open_output(l:currentfilefullpath)
     endif
-endfunction
-                    
+endfunction                  
+" }}}
 
 "  cancel {{{
 function! visualstudio#cancel_build(...)
@@ -203,6 +218,41 @@ function! visualstudio#clean_solution(...)
     let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
 endfunction
 "}}}
+
+"build config {{{
+
+function! visualstudio#set_build_config(...)
+    let l:target = a:0 ? a:1 : s:visualstudio_get_current_buffer_fullpath()
+    let l:cmd = s:visualstudio_make_command("getbuildconfiglist", "-t", l:target)
+    let l:temp = s:visualstudio_system(l:cmd)
+    let l:configlist = s:vital_datastring.lines(l:temp)
+    let l:displaylist = s:visualstudio_make_user_select_list(l:configlist)
+
+    let l:inputnumber = inputlist(l:displaylist) - 1
+    if l:inputnumber < 0 || l:inputnumber > len(l:displaylist)
+        return 
+    endif
+    let l:cmd = s:visualstudio_make_command("setcurrentbuildconfig", "-t", l:target, "-buildconfig", l:configlist[l:inputnumber] )
+    let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
+
+endfunction
+
+function! visualstudio#set_build_platform(...)
+    let l:target = a:0 ? a:1 : s:visualstudio_get_current_buffer_fullpath()
+    let l:cmd = s:visualstudio_make_command("getplatformlist", "-t", l:target)
+    let l:temp = s:visualstudio_system(l:cmd)
+    let l:platformlist = s:vital_datastring.lines(l:temp)
+    let l:displaylist = s:visualstudio_make_user_select_list(l:platformlist)
+
+    let l:inputnumber = inputlist(l:displaylist) - 1
+    if l:inputnumber < 0 || l:inputnumber > len(l:displaylist)
+        return 
+    endif
+    let l:cmd = s:visualstudio_make_command("setcurrentbuildconfig", "-t", l:target, "-platform", l:platformlist[l:inputnumber] )
+    let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
+endfunction
+
+"}}}
 "}}}
 
 
@@ -214,8 +264,7 @@ function! visualstudio#get_current_file(...)
         let l:cmd = s:visualstudio_make_command("getfile", "-t", a:1)
     endif
     
-    let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
-    let l:temp = s:visualstudio_convert_encoding(s:visualstudio_temp_result)
+    let l:temp = s:visualstudio_system(l:cmd)
     exe 'e '.l:temp
 endfunction
 
@@ -269,8 +318,7 @@ function! visualstudio#find(findTarget, resultLocationType, wait, ...)
                 "waitなし かつ vimprocが使用できる かつ　自動表示時のみ
                 "processmanagerを使用する
                 let l:tempcmd = s:visualstudio_make_command("getsolutionfullpath", "-t", l:target)
-                let l:temp_result = s:visualstudio_system(l:tempcmd)
-                let l:solutionfullpath = s:vital_datastring.chop(s:visualstudio_convert_encoding(l:temp_result))
+                let l:solutionfullpath = s:vital_datastring.chop(s:visualstudio_system(l:tempcmd))
                 if s:visualstudio_last_target_solution_fullpath == l:solutionfullpath
                     call s:visualstudio_clear_process_and_augroup()
                 endif
@@ -291,9 +339,7 @@ endfunction
 function! s:visualstudio_save_find_result(findType, target)
     let l:currentfilefullpath = a:target != "" ? a:target : s:visualstudio_get_current_buffer_fullpath()
     let l:cmd = s:visualstudio_make_command(a:findType == 0 ? "getfindresult1" : "getfindresult2", "-t", l:currentfilefullpath)
-    let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
-    let l:temp = s:visualstudio_convert_encoding(s:visualstudio_temp_result)
-    let l:value = split(l:temp, "\n")
+    let l:value = s:vital_datastring.lines(s:visualstudio_system(l:cmd))        
     call writefile(l:value, g:visualstudio_findresultfilepath)
 endfunction
 
@@ -311,18 +357,14 @@ endfunction
 function! s:visualstudio_save_output(target)
     let l:currentfilefullpath = a:target == "" ? s:visualstudio_get_current_buffer_fullpath() : a:target
     let l:cmd = s:visualstudio_make_command("getoutput", "-t", l:currentfilefullpath)
-    let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
-    let l:temp = s:visualstudio_convert_encoding(s:visualstudio_temp_result)
-    let l:value = split(l:temp, "\n")
+    let l:value = s:vital_datastring.lines(s:visualstudio_system(l:cmd))        
     call writefile(l:value, g:visualstudio_outputfilepath)
 endfunction
 
 function! s:visualstudio_save_error_list(target)
     let l:currentfilefullpath = a:target == "" ? s:visualstudio_get_current_buffer_fullpath() : a:target
     let l:cmd = s:visualstudio_make_command("geterrorlist", "-t", l:currentfilefullpath)
-    let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
-    let l:temp = s:visualstudio_convert_encoding(s:visualstudio_temp_result)
-    let l:value = split(l:temp, "\n")
+    let l:value = s:vital_datastring.lines(s:visualstudio_system(l:cmd))        
     call writefile(l:value, g:visualstudio_errorlistfilepath)
 endfunction
 
@@ -359,81 +401,24 @@ endfunction
 function! visualstudio#change_solution_directory(...)
     let l:target = a:0 ? a:1 : s:visualstudio_get_current_buffer_fullpath()
     let l:cmd = s:visualstudio_make_command("getsolutiondirectory", "-t", l:target)
-    let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
-    let s:visualstudio_temp_result = s:visualstudio_convert_encoding(s:visualstudio_temp_result)
-    let s:visualstudio_temp_result = s:vital_datastring.chop(s:visualstudio_temp_result)        
+    let s:visualstudio_temp_result = s:vital_datastring.chop(s:visualstudio_system(l:cmd))        
     echo 'cd '.shellescape(s:visualstudio_temp_result)
 endfunction
 
 function! visualstudio#get_all_files(...)
     let l:target = a:0 ? a:1 : s:visualstudio_get_current_buffer_fullpath()
     let l:cmd = s:visualstudio_make_command("getallfiles", "-t", l:target)
-    let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
-    let s:visualstudio_temp_result = s:visualstudio_convert_encoding(s:visualstudio_temp_result)
-    let l:temp = s:vital_datastring.lines(s:visualstudio_temp_result)
+    let l:temp = s:vital_datastring.lines(s:visualstudio_system(l:cmd))
     return l:temp
 endfunction
-"}}}
 
-"build config {{{
-
-function! visualstudio#set_build_config(...)
-    let l:target = a:0 ? a:1 : s:visualstudio_get_current_buffer_fullpath()
-    let l:cmd = s:visualstudio_make_command("getbuildconfiglist", "-t", l:target)
-    let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
-    let l:temp = s:visualstudio_convert_encoding(s:visualstudio_temp_result)
-    let l:configlist = s:vital_datastring.lines(l:temp)
-    let l:displaylist = []
-    let l:i = 0
-    for l:config in l:configlist
-        :call add(l:displaylist, (l:i + 1) . '.' . l:config)
-        let l:i+=1
-    endfor
-
-    let l:inputnumber = inputlist(l:displaylist) - 1
-    if l:inputnumber < 0 || l:inputnumber > len(l:displaylist)
-        return 
-    endif
-    let l:cmd = s:visualstudio_make_command("setcurrentbuildconfig", "-t", l:target, "-buildconfig", l:configlist[l:inputnumber] )
-    let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
-
-endfunction
-
-function! visualstudio#set_build_platform(...)
-    let l:target = a:0 ? a:1 : s:visualstudio_get_current_buffer_fullpath()
-    let l:cmd = s:visualstudio_make_command("getplatformlist", "-t", l:target)
-    let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
-    let l:temp = s:visualstudio_convert_encoding(s:visualstudio_temp_result)
-    let l:platformlist = s:vital_datastring.lines(l:temp)
-    let l:displaylist = []
-    let l:i = 0
-    for l:platform in l:platformlist
-        :call add(l:displaylist, (l:i + 1) . '.' . l:platform)
-        let l:i+=1
-    endfor
-
-    let l:inputnumber = inputlist(l:displaylist) - 1
-    if l:inputnumber < 0 || l:inputnumber > len(l:displaylist)
-        return 
-    endif
-    let l:cmd = s:visualstudio_make_command("setcurrentbuildconfig", "-t", l:target, "-platform", l:platformlist[l:inputnumber] )
-    let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
-endfunction
-
-"}}}
 
 function! visualstudio#set_startup_project(...)
     let l:target = a:0 ? a:1 : s:visualstudio_get_current_buffer_fullpath()
     let l:cmd = s:visualstudio_make_command("getprojectlist", "-t", l:target)
-    let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
-    let l:temp = s:visualstudio_convert_encoding(s:visualstudio_temp_result)
+    let l:temp = s:visualstudio_system(l:cmd)
     let l:projectlist = s:vital_datastring.lines(l:temp)
-    let l:displaylist = []
-    let l:i = 0
-    for l:project in l:projectlist
-        :call add(l:displaylist, (l:i + 1) . '.' . l:project)
-        let l:i+=1
-    endfor
+    let l:displaylist = s:visualstudio_make_user_select_list(l:projectlist)
 
     let l:inputnumber = inputlist(l:displaylist) - 1
     if l:inputnumber < 0 || l:inputnumber > len(l:displaylist)
@@ -442,6 +427,9 @@ function! visualstudio#set_startup_project(...)
     let l:cmd = s:visualstudio_make_command("setstartupproject", "-t", l:target, "-p", l:projectlist[l:inputnumber] )
     let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
 endfunction
+"}}}
+
+
 
 " Restore 'cpoptions' {{{
 let &cpo = s:save_cpo
