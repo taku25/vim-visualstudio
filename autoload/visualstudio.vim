@@ -398,7 +398,7 @@ function! visualstudio#add_break_point()
     let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
 endfunction
 
-function! visualstudio#change_solution_directory(...)
+function! visualstudio#change_directory(...)
     let l:target = a:0 ? a:1 : s:visualstudio_get_current_buffer_fullpath()
     let l:cmd = s:visualstudio_make_command("getsolutiondirectory", "-t", l:target)
     let s:visualstudio_temp_result = s:vital_datastring.chop(s:visualstudio_system(l:cmd))        

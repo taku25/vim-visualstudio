@@ -31,10 +31,14 @@ winextention周りで32 & 64bitなどの問題が発生してしまう可能性�
 * 要 VisualStudioController.exe
  * パスが通っているディレクトリかg:visualstudio_controllerpathでフルパス指定  
  * https://github.com/taku25/VisualStudioController  
-* vimprocがインストールされている場合デフォルトでは自動的にvimprocを使用します
+* vimprocがインストールされている場合デフォルトでは自動的にvimprocを使用し非同期でbuildなどを実行できるようになります
 * VisuaslStudio2005以上
-       **quickfixを使用してエラー個所などにジャンプする場合は VisualStudioのプロジェクト設定で/FCオプションを使用してください**
-       **http://msdn.microsoft.com/ja-jp/library/027c4t2s.aspx**
+ **quickfixを使用してエラー個所などにジャンプする場合は VisualStudioのプロジェクト設定で/FCオプションを使用してください**
+ **http://msdn.microsoft.com/ja-jp/library/027c4t2s.aspx**
+* Unite
+ ** ソリューションに含まれているファイルを表示できるようになります
+
+
 
 ##インストール
 * NeoBundle 'taku25/vim-visualstudio'  
@@ -44,7 +48,7 @@ winextention周りで32 & 64bitなどの問題が発生してしまう可能性�
 個々の環境のpluginフォルダにコピー
 
 ##機能
-###version 2014/4/05現在
+###version 2014/5/05現在
 * VisualStudioで編集中のファイルをVimで開く
 * Vimで編集中のファイルをVisualStudioで開く
 * VisualStudioで編集中のソリューションに含まれているファイルをVim上で編集していた場合
@@ -54,13 +58,22 @@ winextention周りで32 & 64bitなどの問題が発生してしまう可能性�
  * ソリューションのビルドキャンセル
  * ソリューションの実行
  * ソリューションのデバッグ実行
- * Vim上で編集中のファイルのみコンパイル
- * ビルド,リビルド,クリーン&コンパイルの結果を表示
+ * ソリューション内での検索
+ * プロジェクト内での検索
  * 検索結果1の表示
  * 検索結果2の表示
+ * スタートアッププロジェクトの設定
+ * ビルドコンフィグの設定
+ * ビルドプラットフォームの設定
+ * Vim上で編集中のファイルのみコンパイル
+ * ビルド,リビルド,クリーン&コンパイルの結果を表示
  * Error一覧の表示  
-       **要VisualStudio2005以上**
+   **要VisualStudio2005以上**
  * 編集中のファイルのカーソルがある行にBreakPointの追加
+ * ソリューションのあるディレクトリに移動 
+ * ソリューションに含まれているファイルを検索して開く
+  **要Unite以上**
+  ![image](https://dl.dropboxusercontent.com/u/45602523/vim-visualstudio.gif)
 
 
 ##コマンド

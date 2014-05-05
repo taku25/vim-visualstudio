@@ -126,7 +126,7 @@ command! -nargs=? VSGetFile call visualstudio#get_current_file(<f-args>)
 
 "other {{{
 command! VSAddBreakPoint call visualstudio#add_break_point()
-command! -nargs=? VSChangeSolutionDirectory call visualstudio#change_solution_directory(<f-args>)
+command! -nargs=? VSChangeDirectory call visualstudio#change_directory(<f-args>)
 "}}}
 
 
