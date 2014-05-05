@@ -275,13 +275,19 @@ function! visualstudio#open_file()
 endfunction
 "}}}
 
-" run {{{
+" run & stop {{{
 function! visualstudio#run(runType, ...)
     let l:currentfilefullpath = a:0 ? a:1 : s:visualstudio_get_current_buffer_fullpath()
     let l:cmd = s:visualstudio_make_command("run", "-t", l:currentfilefullpath)
     if a:runType == 1
         let l:cmd = s:visualstudio_make_command("debugrun", "-t", l:currentfilefullpath)
     endif
+    let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
+endfunction
+
+function! visualstudio#stop_debug_run(...)
+    let l:currentfilefullpath = a:0 ? a:1 : s:visualstudio_get_current_buffer_fullpath()
+    let l:cmd = s:visualstudio_make_command("stopdebugrun", "-t", l:currentfilefullpath)
     let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
 endfunction
 "}}}
