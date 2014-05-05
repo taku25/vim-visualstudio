@@ -35,7 +35,7 @@ winextention周りで32 & 64bitなどの問題が発生してしまう可能性�
   **quickfixを使用してエラー個所などにジャンプする場合は VisualStudioのプロジェクト設定で/FCオプションを使用してください**  
   **http://msdn.microsoft.com/ja-jp/library/027c4t2s.aspx**  
 * Unite  
-  ** ソリューションに含まれているファイルを表示できるようになります
+  * ソリューションに含まれているファイルを表示できるようになります  
 
 ##インストール
 * NeoBundle 'taku25/vim-visualstudio'  
@@ -69,8 +69,8 @@ winextention周りで32 & 64bitなどの問題が発生してしまう可能性�
  * 編集中のファイルのカーソルがある行にBreakPointの追加
  * ソリューションのあるディレクトリに移動 
  * ソリューションに含まれているファイルを検索して開く  
-  **要Unite以上**  
-  ![image](https://dl.dropboxusercontent.com/u/45602523/vim-visualstudio.gif)
+  **要Unite**  
+  ![image](https://dl.dropboxusercontent.com/u/45602523/vim-visualstudio_unite.gif)
 
 
 ##コマンド
