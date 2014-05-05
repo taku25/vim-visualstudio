@@ -6,12 +6,11 @@ VimからVisualStudioに対しての操作を行うプラグイン
 ![image](https://dl.dropboxusercontent.com/u/45602523/vim-visualstudio.gif)
 
 ##参考
-同じようなプラグインで  
-visual_studio.vim  
+同じようなプラグインで
+**visual_studio.vim**
 というプラグインもあるのですがvisual_studioはもう何年も更新がされていないのと  
 pythonを使用していのもあり環境にはよって2.7 & 3.0系の縛りで使用できなかったり  
 winextention周りで32 & 64bitなどの問題が発生してしまう可能性があります  
-    
 このvim-visualstudioプラグインではできるだけそういう他の環境に依存しないように作成したつもりです
 (依存しているVisualStudioController.exeはC#とVisualStudio DTE(COM)を使用して作成されていますのでVisualStudioがインストールされていれば動作可能です)
 
@@ -28,17 +27,15 @@ winextention周りで32 & 64bitなどの問題が発生してしまう可能性�
 ##動作確認 & 必要外部Exe
 * kaoriya版gVim  7.3 32bit & 64bit 
 * Windows 7 32bit / 64 bit
-* 要 VisualStudioController.exe
- * パスが通っているディレクトリかg:visualstudio_controllerpathでフルパス指定  
- * https://github.com/taku25/VisualStudioController  
+* 要 VisualStudioController.exe  
+  * パスが通っているディレクトリかg:visualstudio_controllerpathでフルパス指定  
+  * https://github.com/taku25/VisualStudioController  
 * vimprocがインストールされている場合デフォルトでは自動的にvimprocを使用し非同期でbuildなどを実行できるようになります
-* VisuaslStudio2005以上
- **quickfixを使用してエラー個所などにジャンプする場合は VisualStudioのプロジェクト設定で/FCオプションを使用してください**
- **http://msdn.microsoft.com/ja-jp/library/027c4t2s.aspx**
-* Unite
- ** ソリューションに含まれているファイルを表示できるようになります
-
-
+* VisuaslStudio2005以上  
+  **quickfixを使用してエラー個所などにジャンプする場合は VisualStudioのプロジェクト設定で/FCオプションを使用してください**  
+  **http://msdn.microsoft.com/ja-jp/library/027c4t2s.aspx**  
+* Unite  
+  ** ソリューションに含まれているファイルを表示できるようになります
 
 ##インストール
 * NeoBundle 'taku25/vim-visualstudio'  
@@ -68,11 +65,11 @@ winextention周りで32 & 64bitなどの問題が発生してしまう可能性�
  * Vim上で編集中のファイルのみコンパイル
  * ビルド,リビルド,クリーン&コンパイルの結果を表示
  * Error一覧の表示  
-   **要VisualStudio2005以上**
+  **要VisualStudio2005以上**
  * 編集中のファイルのカーソルがある行にBreakPointの追加
  * ソリューションのあるディレクトリに移動 
- * ソリューションに含まれているファイルを検索して開く
-  **要Unite以上**
+ * ソリューションに含まれているファイルを検索して開く  
+  **要Unite以上**  
   ![image](https://dl.dropboxusercontent.com/u/45602523/vim-visualstudio.gif)
 
 
