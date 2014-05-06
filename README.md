@@ -32,16 +32,16 @@ plugin operates Vim to VisualStudio
 
 2. Install with `:NeoBundleInstall`.
 
-### Requirements:
-####VisualStudioController
-##### Manually
+## Requirements:
+### VisualStudioController
+#### Manually
 1. Dowanload from "https://github.com/taku25/VisualStudioController" to VisualStudioController.zip
 
 2. Set VisualStudioController path .vimrc or .gvimrc
 
         let g:visualstudio_controllerpath = xxx(default value is VisualStudioController.exe)
 
-##### Git
+#### Git
 1. Install with the following command.
 
         git clone https://github.com/taku25/VisualStudioController xxxxx(user folder)
@@ -50,12 +50,12 @@ plugin operates Vim to VisualStudio
 
         let g:visualstudio_controllerpath = xxx(default value is VisualStudioController.exe)
 
-### Recommends:
-####Vimproc
+## Recommends:
+### vimproc
 you will be able to run asynchronously search and build  
 https://github.com/Shougo/vimproc.vim
 
-####unite.vim
+### unite.vim
 You can browse the file in a solution now using unite.  
 https://github.com/Shougo/unite.vim
 
