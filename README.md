@@ -8,10 +8,6 @@ plugin operates Vim to VisualStudio
 ## Operation has been confirmed in:
 * gVim version kaoriya 7.3xx 32bit & 64bit
 * gVim version kaoriya 7.4xx 32bit & 64bit
-* Windows 7 32bit & 64 bit
-* Windows 8 64 bit
-* Windows 8.1 64 bit
-
 
 ## Installation
 ### Manually
