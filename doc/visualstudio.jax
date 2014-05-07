@@ -1,0 +1,468 @@
+﻿vim-visualstudio.txt*	VimからVisualStudioを操作し情報を取得する
+
+Author  : taku25 <taku36@gmail.com>
+Version : 2014-05-5
+License : MIT license {{{
+
+	Permission is hereby granted, free of charge, to any person obtaining
+	a copy of this software and associated documentation files (the
+	"Software"), to deal in the Software without restriction, including
+	without limitation the rights to use, copy, modify, merge, publish,
+	distribute, sublicense, and/or sell copies of the Software, and to
+	permit persons to whom the Software is furnished to do so, subject to
+	the following conditions:
+	The above copyright notice and this permission notice shall be
+	included in all copies or substantial portions of the Software.
+
+	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+	EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+	MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+	IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+	CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+	TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+	SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+}}}
+
+目次					*vim-visualstudio-contents*
+
+	概要			|vim-visualstudio-introduction|
+	インストール		|vim-visualstudio-install|
+	  任意			  |vim-visualstudio-install-recommends|
+	変数			|vim-visualstudio-variables|
+	コマンド	    	|vim-visualstudio-command|
+	設定例			|vim-visualstudio-settings-example|
+	ToDo			|vim-visualstudio-todo|
+	更新履歴		|vim-visualstudio-changelog|
+
+==============================================================================
+概要					*vim-visualstudio-introduction*
+
+	*vim-visualstudio* は、Vimで編集中のファイルからそれファイルを含んでいる
+	ソリューションを起動中のVisualStudioから探し出しビルドや検索などを行い
+	その結果をVimのquickfix	に表示するプラグインです、
+	また|vimproc|や|unite|を同時に使用することにより非同期にビルド、検索を実行
+	ソリューションのファイルブラウズをuniteのインターフェイスを用いて行う
+	ことができます
+
+==============================================================================
+インストール				*vim-visualstudio-install*
+
+	1. vim-visualstudio
+
+	配布アーカイブに含まれるファイル群を、そのフォルダごと Vim の
+	'runtimepath' にコピーします。 $HOME/.vim（Windows の場合は
+	$HOME/vimfiles）へのインストールがもっとも一般的です
+	インストール後の配置は
+
+	$HOME/.vim/autoload/visualstudio*
+	$HOME/.vim/plugin/visualstudio.vim
+	$HOME/.vim/doc/visualstudio.*
+
+	になります。
+
+	2. VisualStudioController
+
+	https://github.com/taku25/VisualStudioController
+
+	直接zipでダウンロードしてもいいのですが古いVisualstudiocontrollerを使
+	用している場合動作しないコマンドが出てくる場合もあるのでgit cloneを使
+	用するのをおすすめします
+
+	git clone https://github.com/taku25/VisualStudioController.git userdirecotry
+
+	3. パスの設定
+	
+	vim-visualstudioのg:visualstudio_controllerpathに
+	visualsutVisualstudiocontrollerのパスを設定
+
+	let g:visualstudio_controllerpath = xxxx
+	xxxxにはvisualstudiocontroller.exeへのパスを設定します
+	デフォルトの値は"visualstudiocontroller.exe"になっています
+	
+	インストールに成功するとVisualStudioを起動して開いているソリューション
+	に含まれているファイルをvimで編集中に:VSBuild を実行すれば
+	VisualStudioでビルドが始まりビルド結果がquickfixに表示されます
+
+------------------------------------------------------------------------------
+任意					*vim-visualstudio--install-recommends*
+
+	1.vimproc
+	
+	https://github.com/Shougo/vimproc.vim
+
+	インストール方法は上記ページをご覧ください
+	またkaoriya版gVimを使用している場合は自動的にインストールされています
+	非同期でビルド、検索を行えるようになります
+
+	2.unite
+	
+	https://github.com/Shougo/unite.vim
+
+	インストール方法は上記ページをご覧ください
+	ソリューションに含まれるファイルをuniteインターフェイスを使用してブラ
+	ウズする事ができます
+
+	3.errormarker
+
+	https://github.com/vim-scripts/errormarker.vim
+	or
+	http://www.vim.org/scripts/script.php?script_id=1861
+	
+	インストール方法は上記ページをご覧ください
+
+==============================================================================
+変数					*vim-visualstudio-variables*
+
+					*g:visualstudio_controllerpath*
+    g:visualstudio_controllerpath	
+
+	VisualstudioContollerへのパスを設定します
+
+	初期値は {'VisualStudioController.exe'}
+
+	script内でこの変数に設定された値はexpandを使用して展開しているので環境
+	変数変数や'~'を使用する事ができます
+
+					*g:visualstudio_outputfilepath*
+    g:visualstudio_outputfilepath
+
+	VisualStudioの出力ウインドウの値を一時的に保存するファイルパスを設定し
+	ます
+
+	初期値は expand($TEMP).'/vs_output.vstxt'
+
+					*g:visualstudio_errorlistfilepath*
+    g:visualstudio_errorlistfilepath
+	
+	VisualStudioのエラー一覧ウインドウの値を一時的に保存するファイルパスを
+	設定します
+
+	初期値は expand($TEMP).'/vs_errorlist.vstxt'
+					
+					*g:visualstudio_getfileresultfilepath*
+    g:visualstudio_getfileresultfilepath
+	
+	VisualStudioの検索結果ウインドウの値を一時的に保存するファイルパスを設
+	定します
+
+	初期値は expand($TEMP).'/vs_getfileresult.vstxt'
+
+					*g:visualstudio_quickfixheight*
+    g:visualstudio_quickfixheight
+    
+	ビルド結果、エラー一覧や検索結果を表示するquickfixの縦幅を設定します
+
+	初期値は 10
+	
+					*g:visualstudio_errorformat*
+    g:visualstudio_errorformat
+    
+	VisualStudioの出力結果ウインドウの内容をquickfixに表示する時に使用する
+	エラーフォーマットを設定します
+
+	初期値は '%.\*>%f(%l): %m'
+	
+					*g:visualstudio_errorlistformat*
+    g:visualstudio_errorlistformat
+    
+	VisualStudioのエラー一覧結果ウインドウの内容をquickfixに表示する時に使
+	用するエラーフォーマットを設定します
+
+	初期値は '%f\ (%l\,%c): %m'
+
+					*g:visualstudio_findformat*
+    g:visualstudio_findformat
+    
+	VisualStudioの検索結果ウインドウの内容をquickfixに表示するときに使用す
+	るエラーフォーマットを設定します
+
+	初期値は '%f\(%l\):%m'
+
+					*g:visualstudio_showautooutput*
+    g:visualstudio_showautooutput
+    
+	VisualStudioのビルド、検索終了時に自動的にquickfixを表示するかを設定し
+	ます
+
+	初期値は 1
+
+	自動的に表示したくないときは0を設定します
+
+					*g:visualstudio_enableerrormarker*
+    g:visualstudio_enableerrormarker
+    
+	errormarker.vimを使用している時にエラー箇所がハイライトされるように自
+	動で設定します
+
+	初期値は 0
+
+	自動的に設定したいときは1を設定します
+
+					*g:visualstudio_enablevimproc*
+    g:visualstudio_enablevimproc
+
+	vimprocを使用するか設定します
+
+	初期値は 1
+
+	使用しないときは0を設定します
+	もし1に設定されていたとしてもvimprocのインストールが行われていない場合
+	は標準の|system|関数を使用します
+					
+					*g:visualstudio_updatetime*
+    g:visualstudio_updatetime
+
+	非同期にビルド、検索を行った場合にどれくらいの間隔で終了をチェックする
+	かを設定します
+
+	初期値は 2000(ミリ秒)
+
+					*g:visualstudio_terminalencoding*
+    g:visualstudio_terminalencoding
+
+	VisualStudioControllerがコンソールに出力するエンコーディングを設定します
+
+	初期値は utf-8
+
+	utf-8以外はコマンドプロンプトの標準出力にのみ対応しています
+	システムの値にしたいときは""と設定してもかまいません
+
+==============================================================================
+コマンド				*vim-visualstudio-command*
+					
+					*VSCompile*
+    VSCompile
+
+	編集中のファイルのみをコンパイルします
+	ビルド終了時に自動的にquickfixが開きます
+
+					*VSBuild*
+    VSBuild
+
+	ソリューションのビルドを行います
+	ビルド終了時に自動的にquickfixが開きます
+	
+					*VSReBuild*
+    VSReBuild
+
+	ソリューションのリビルドを行います
+	ビルド終了時に自動的にquickfixが開きます
+
+					*VSCompileNoWait*
+    VSCompileNoWait
+
+	編集中のファイルのみをコンパイルします
+	コンパイルの終了待ちを行いません
+
+					*VSBuildNoWait*
+    VSBuildNoWait
+
+	ソリューションのビルドを行います
+	コンパイルの終了待ちを行いません
+	|g:visualstudio_enablevimproc|,|g:visualstudio_showautooutput|どちらも
+	有効になっている場合はビルド終了時に自動的にquickfixが開きます
+	
+					*VSReBuildNoWait*
+    VSReBuildNoWait
+
+	ソリューションのリビルドを行います
+	コンパイルの終了待ちを行いません
+	|g:visualstudio_enablevimproc|,|g:visualstudio_showautooutput|どちらも
+	有効になっている場合はビルド終了時に自動的にquickfixが開きます
+
+					*VSCancelBuild*
+    VSCancelBuild
+
+	ビルドのキャンセルを行います
+	引数がない場合は編集中のファイルが含まれるソリューションをターゲットに
+	します。引数でソリューション名の一部かすべてを設定することでソリュー
+	ションを指定することできます
+
+					*VSClean*
+    VSClean
+
+	ソリューションのクリーンを行います
+	引数がない場合は編集中のファイルが含まれるソリューションをターゲットに
+	します。引数でソリューション名の一部かすべてを設定することでソリュー
+	ションを指定することできます
+
+					*VSOutput*
+    VSOutput
+
+	出力ウインドウの内容をquickfixに表示します
+	引数がない場合は編集中のファイルが含まれるソリューションをターゲットに
+	します。引数でソリューション名の一部かすべてを設定することでソリュー
+	ションを指定することできます
+
+					*VSErorrList*
+    VSErorrList
+
+	エラー一覧ウインドウの内容をquickfixに表示します
+	引数がない場合は編集中のファイルが含まれるソリューションをターゲットに
+	します。引数でソリューション名の一部かすべてを設定することでソリュー
+	ションを指定することできます
+
+					*VSRun*
+    VSRun
+
+	実行します
+	引数がない場合は編集中のファイルが含まれるソリューションをターゲットに
+	します。引数でソリューション名の一部かすべてを設定することでソリュー
+	ションを指定することできます
+
+					*VSDebugRun*
+    VSDebugRun
+
+	デバッグ付きで実行します
+	引数がない場合は編集中のファイルが含まれるソリューションをターゲットに
+	します。引数でソリューション名の一部かすべてを設定することでソリュー
+	ションを指定することできます
+
+					*VSStopDebugRun*
+    VSStopDebugRun
+
+	デバッグ実行を終了します
+	引数がない場合は編集中のファイルが含まれるソリューションをターゲットに
+	します。引数でソリューション名の一部かすべてを設定することでソリュー
+	ションを指定することできます
+
+					*VSSetStartUpProject*
+    VSSetStartUpProject
+
+	スタートアッププロジェクトの設定を行います
+	引数がない場合は編集中のファイルが含まれるソリューションをターゲットに
+	します。引数でソリューション名の一部かすべてを設定することでソリュー
+	ションを指定することできます
+
+					*VSSetBuildConfig*
+    VSSetBuildConfig
+
+	ビルドコンフィグの設定を行います
+	引数がない場合は編集中のファイルが含まれるソリューションをターゲットに
+	します。引数でソリューション名の一部かすべてを設定することでソリュー
+	ションを指定することできます
+
+					*VSSetPlatform*
+    VSSetPlatform
+
+	プラットフォームの設定を行います
+	引数がない場合は編集中のファイルが含まれるソリューションをターゲットに
+	します。引数でソリューション名の一部かすべてを設定することでソリュー
+	ションを指定することできます
+
+
+					*VSFindSolution1*
+    VSFindSolution1(findwhat)
+
+	引数に与えられた文字列をソリューションを対象に検索を行い、
+	検索結果ウインドウ1に表示します。
+	検索終了時に検索結果をquickfixに表示します
+
+					*VSFindSolution2*
+    VSFindSolution2(findwhat)
+
+	引数に与えられた文字列をソリューションを対象に検索を行い、
+	検索結果ウインドウ2に表示します。
+	検索終了時に検索結果をquickfixに表示します
+
+					*VSFindSolutionNoWait1*
+    VSFindSolutionNoWait1(findwhat)
+
+	引数に与えられた文字列をソリューションを対象に検索を行い、
+	検索結果ウインドウ1に表示します。検索終了街を行いませんが
+	|g:visualstudio_enablevimproc|,|g:visualstudio_showautooutput|どちらも
+	有効になっている場合はビルド終了時に自動的にquickfixが開きます
+
+					*VSFindSolutionNoWait2*
+    VSFindSolutionNoWait2(findwhat)
+
+	引数に与えられた文字列をソリューションを対象に検索を行い、
+	検索結果ウインドウ2に表示します。検索終了街を行いませんが
+	|g:visualstudio_enablevimproc|,|g:visualstudio_showautooutput|どちらも
+	有効になっている場合はビルド終了時に自動的にquickfixが開きます
+
+					*VSFindProject1*
+    VSFindSolution1(findwhat)
+
+	引数に与えられた文字列をプロジェクトを対象に検索を行い、
+	検索結果ウインドウ1に表示します。
+	検索終了時に検索結果をquickfixに表示します
+
+					*VSFindProject2*
+    VSFindSolution2(findwhat)
+
+	引数に与えられた文字列をプロジェクトを対象に検索を行い、
+	検索結果ウインドウ2に表示します。
+	検索終了時に検索結果をquickfixに表示します
+
+					*VSFindProjectNoWait1*
+    VSFindSolutionNoWait1(findwhat)
+
+	引数に与えられた文字列をプロジェクトを対象に検索を行い、
+	検索結果ウインドウ1に表示します。検索終了街を行いませんが
+	|g:visualstudio_enablevimproc|,|g:visualstudio_showautooutput|どちらも
+	有効になっている場合はビルド終了時に自動的にquickfixが開きます
+
+					*VSFindProjectNoWait2*
+    VSFindSolutionNoWait2(findwhat)
+
+	引数に与えられた文字列をプロジェクトを対象に検索を行い、
+	検索結果ウインドウ2に表示します。検索終了街を行いませんが
+	|g:visualstudio_enablevimproc|,|g:visualstudio_showautooutput|どちらも
+	有効になっている場合はビルド終了時に自動的にquickfixが開きます
+
+					*VSFindResult1*
+    VSFindResult1
+
+	検索結果ウインドウ1の内容をquickfixに表示します
+	引数がない場合は編集中のファイルが含まれるソリューションをターゲットに
+	します。引数でソリューション名の一部かすべてを設定することでソリュー
+	ションを指定することできます
+
+					*VSFindResult2*
+    VSFindResult2
+
+	検索結果ウインドウ1の内容をquickfixに表示します
+	引数がない場合は編集中のファイルが含まれるソリューションをターゲットに
+	します。引数でソリューション名の一部かすべてを設定することでソリュー
+	ションを指定することできます
+					
+					*VSOpenFile*
+    VSOpenFile
+
+	Vimで編集中のファイルをVisualStudioで開きます
+
+					*VSGetFile*
+    VSGetFile
+
+	VisualStudioで編集のファイルをVimで開きます
+	引数にソリューション名の一部かすべてを設定することでVisualStudioを
+	指定することできます
+
+					*VSAddBreakPoint*
+    VSAddBreakPoint
+
+	Vimで編集中のファイル＋カーソルがある行にブレークポイントをセットしま
+	す
+
+					*VSChangeDirectory*
+    VSChangeDirectory
+
+	ソリューションのある場所に移動します
+	引数でソリューション名の一部かすべてを設定することでソリュー
+	ションを指定することできます
+
+==============================================================================
+設定例					*vim-visualstudio-settings-example*
+>
+<
+
+==============================================================================
+TODO					*vim-visualstudio-todo*
+
+
+==============================================================================
+更新履歴				*vim-visualstudio-changelog*
+
+
+vim:tw=78:ts=8:ft=help:norl:noet:fen:fdl=0:fdm=marker:
