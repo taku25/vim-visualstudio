@@ -36,8 +36,8 @@ plugin operates Vim to VisualStudio
 ### VisualStudioController
 #### Manually
 1. Dowanload from "https://github.com/taku25/VisualStudioController" to VisualStudioController.zip
-
-2. Set VisualStudioController path .vimrc or .gvimrc
+2. unzip VisualStudioController.zip
+3. Set VisualStudioController path .vimrc or .gvimrc
 
         let g:visualstudio_controllerpath = xxx(default value is VisualStudioController.exe)
 
