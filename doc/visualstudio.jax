@@ -30,6 +30,7 @@ License : MIT license {{{
 	  任意			  |vim-visualstudio-install-recommends|
 	変数			|vim-visualstudio-variables|
 	コマンド	    	|vim-visualstudio-command|
+	  UniteSource	         |vim-visualstudio-unite|
 	設定例			|vim-visualstudio-settings-example|
 	ToDo			|vim-visualstudio-todo|
 	更新履歴		|vim-visualstudio-changelog|
@@ -451,6 +452,17 @@ License : MIT license {{{
 	ソリューションのある場所に移動します
 	引数でソリューション名の一部かすべてを設定することでソリュー
 	ションを指定することできます
+					
+					
+------------------------------------------------------------------------------
+UniteSource				*vim-visualstudio-unite*
+	    
+					*vsfile*
+    vsfile
+
+	unite用のsource
+	ソリューションに含まれているファイルをuniteインターフェイスを用いて
+	ブラウズできます
 
 ==============================================================================
 設定例					*vim-visualstudio-settings-example*
