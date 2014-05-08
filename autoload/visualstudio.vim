@@ -360,27 +360,15 @@ endfunction
 
 
 "other {{{
-function! s:visualstudio_save_output(target)
-    let l:currentfilefullpath = a:target == "" ? s:visualstudio_get_current_buffer_fullpath() : a:target
-    let l:cmd = s:visualstudio_make_command("getoutput", "-t", l:currentfilefullpath)
-    let l:value = s:vital_datastring.lines(s:visualstudio_system(l:cmd))        
-    call writefile(l:value, g:visualstudio_outputfilepath)
-endfunction
-
-function! s:visualstudio_save_error_list(target)
-    let l:currentfilefullpath = a:target == "" ? s:visualstudio_get_current_buffer_fullpath() : a:target
-    let l:cmd = s:visualstudio_make_command("geterrorlist", "-t", l:currentfilefullpath)
-    let l:value = s:vital_datastring.lines(s:visualstudio_system(l:cmd))        
-    call writefile(l:value, g:visualstudio_errorlistfilepath)
-endfunction
 
 function! visualstudio#open_output(...)
-    "またないと正確に値が取れない時がある...orz
     sleep 500m
-    :call s:visualstudio_save_output(a:0 ? a:1 : "")
+    let l:currentfilefullpath = a:0 != 0 ? a:1 : s:visualstudio_get_current_buffer_fullpath()
+    let l:cmd = s:visualstudio_make_command("getoutput", "-t", l:currentfilefullpath)
+    let l:value = s:vital_datastring.lines(s:visualstudio_system(l:cmd))        
     let &errorformat = g:visualstudio_errorformat
+    cgetexpr l:value
     exe 'copen '.g:visualstudio_quickfixheight
-    exe 'cfile '.g:visualstudio_outputfilepath
     if g:visualstudio_enableerrormarker == 1
         :doautocmd QuickFixCmdPost make
     endif
@@ -388,10 +376,12 @@ endfunction
 
 function! visualstudio#open_error_list(...)
     sleep 500m
-    :call s:visualstudio_save_error_list(a:0 ? a:1 : "")
+    let l:currentfilefullpath = a:0 != 0 ? a:1 : s:visualstudio_get_current_buffer_fullpath()
+    let l:cmd = s:visualstudio_make_command("geterrorlist", "-t", l:currentfilefullpath)
+    let l:value = s:vital_datastring.lines(s:visualstudio_system(l:cmd))        
     let &errorformat = g:visualstudio_errorlistformat
+    cgetexpr l:value
     exe 'copen '.g:visualstudio_quickfixheight
-    exe 'cfile '.g:visualstudio_errorlistfilepath
     if g:visualstudio_enableerrormarker == 1
         :doautocmd QuickFixCmdPost make
     endif
