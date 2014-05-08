@@ -25,15 +25,15 @@ License : MIT license {{{
 
 目次					*vim-visualstudio-contents*
 
-	概要			|vim-visualstudio-introduction|
-	インストール		|vim-visualstudio-install|
-	    任意		    |vim-visualstudio-install-recommends|
-	変数			|vim-visualstudio-variables|
-	コマンド		|vim-visualstudio-command|
-	    UniteSource		    |vim-visualstudio-unite|
-	設定例			|vim-visualstudio-settings-example|
-        ToDo			|vim-visualstudio-todo|
-	更新履歴		|vim-visualstudio-changelog|
+        概要                   |vim-visualstudio-introduction|
+        インストール           |vim-visualstudio-install|
+          任意                   |vim-visualstudio-install-recommends|
+        変数                   |vim-visualstudio-variables|
+        コマンド               |vim-visualstudio-command|
+          UniteSource            |vim-visualstudio-unite|
+        設定例                 |vim-visualstudio-settings-example|
+        ToDo                   |vim-visualstudio-todo|
+        更新履歴               |vim-visualstudio-changelog|
 
 ==============================================================================
 概要					*vim-visualstudio-introduction*
