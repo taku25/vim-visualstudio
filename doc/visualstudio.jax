@@ -137,7 +137,7 @@ License : MIT license {{{
 	VisualStudioの出力結果ウインドウの内容をquickfixに表示する時に使用する
 	エラーフォーマットを設定します
 
-	初期値は '%.\*>%f(%l): %m'
+	初期値は '%.%#>%f(%l):%m,%.%#>%f(%l\,%c%.%#):%m'
 	
 					*g:visualstudio_errorlistformat*
     g:visualstudio_errorlistformat
