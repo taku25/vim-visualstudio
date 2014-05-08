@@ -16,12 +16,6 @@ set cpo&vim
 let g:visualstudio_controllerpath =
       \ get(g:, 'visualstudio_controllerpath', 'VisualStudioController.exe')
 
-let g:visualstudio_outputfilepath =
-      \ get(g:, 'visualstudio_outputfilepath', expand($TEMP).'/vs_output.vstxt')
-
-let g:visualstudio_errorlistfilepath =
-      \ get(g:, 'visualstudio_errorlistfilepath', expand($TEMP).'/vs_errorlist.vstxt')
-
 let g:visualstudio_findresultfilepath =
       \ get(g:, 'visualstudio_findresultfilepath', expand($TEMP).'/vs_findresult.vstxt')
 

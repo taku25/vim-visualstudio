@@ -124,22 +124,6 @@ License : MIT license {{{
 	script内でこの変数に設定された値はexpandを使用して展開しているので環境
 	変数変数や'~'を使用する事ができます
 
-					*g:visualstudio_outputfilepath*
-    g:visualstudio_outputfilepath
-
-	VisualStudioの出力ウインドウの値を一時的に保存するファイルパスを設定し
-	ます
-
-	初期値は expand($TEMP).'/vs_output.vstxt'
-
-					*g:visualstudio_errorlistfilepath*
-    g:visualstudio_errorlistfilepath
-	
-	VisualStudioのエラー一覧ウインドウの値を一時的に保存するファイルパスを
-	設定します
-
-	初期値は expand($TEMP).'/vs_errorlist.vstxt'
-					
 					*g:visualstudio_getfileresultfilepath*
     g:visualstudio_getfileresultfilepath
 	
