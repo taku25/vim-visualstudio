@@ -32,13 +32,13 @@ let g:visualstudio_quickfixheight =
       \ get(g:, 'visualstudio_quickfixheight', 10)
 
 let g:visualstudio_errorformat =
-      \ get(g:, 'visualstudio_errorformat', '%.\*>%f(%l): %m')
+      \ get(g:, 'visualstudio_errorformat', '%.%#>%f(%l):%m,%.%#>%f(%l\,%c%.%#):%m')
 
 let g:visualstudio_errorlistformat =
-      \ get(g:, 'visualstudio_errorlistformat', '%f\ (%l\,%c): %m')
+      \ get(g:, 'visualstudio_errorlistformat', '%f\ (%l\\,%c):%m')
 
 let g:visualstudio_findformat =
-      \ get(g:, 'visualstudio_findformat', '%f\(%l\):%m')
+      \ get(g:, 'visualstudio_findformat', '%f(%l):%m')
 
 let g:visualstudio_showautooutput =
       \ get(g:, 'visualstudio_showautooutput', 1)
