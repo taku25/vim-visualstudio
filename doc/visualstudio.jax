@@ -124,14 +124,6 @@ License : MIT license {{{
 	script内でこの変数に設定された値はexpandを使用して展開しているので環境
 	変数変数や'~'を使用する事ができます
 
-					*g:visualstudio_getfileresultfilepath*
-    g:visualstudio_getfileresultfilepath
-	
-	VisualStudioの検索結果ウインドウの値を一時的に保存するファイルパスを設
-	定します
-
-	初期値は expand($TEMP).'/vs_getfileresult.vstxt'
-
 					*g:visualstudio_quickfixheight*
     g:visualstudio_quickfixheight
     

@@ -342,18 +342,13 @@ function! visualstudio#find(findTarget, resultLocationType, wait, ...)
 endfunction
 
 
-function! s:visualstudio_save_find_result(findType, target)
-    let l:currentfilefullpath = a:target != "" ? a:target : s:visualstudio_get_current_buffer_fullpath()
+function! visualstudio#open_find_result(findType, ...)
+    let l:currentfilefullpath = a:0 != 0 ? a:1 : s:visualstudio_get_current_buffer_fullpath()
     let l:cmd = s:visualstudio_make_command(a:findType == 0 ? "getfindresult1" : "getfindresult2", "-t", l:currentfilefullpath)
     let l:value = s:vital_datastring.lines(s:visualstudio_system(l:cmd))        
-    call writefile(l:value, g:visualstudio_findresultfilepath)
-endfunction
-
-function! visualstudio#open_find_result(findType, ...)
-    :call s:visualstudio_save_find_result(a:findType, a:0 ? a:1 : "")
+    let &errorformat = g:visualstudio_findformat
+    cgetexpr l:value
     exe 'copen '.g:visualstudio_quickfixheight
-    exe 'setlocal errorformat='.g:visualstudio_findformat
-    exe 'cfile '.g:visualstudio_findresultfilepath
 endfunction
 
 ""}}}

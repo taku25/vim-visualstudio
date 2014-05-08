@@ -16,12 +16,6 @@ set cpo&vim
 let g:visualstudio_controllerpath =
       \ get(g:, 'visualstudio_controllerpath', 'VisualStudioController.exe')
 
-let g:visualstudio_findresultfilepath =
-      \ get(g:, 'visualstudio_findresultfilepath', expand($TEMP).'/vs_findresult.vstxt')
-
-let g:visualstudio_getfileresultfilepath =
-      \ get(g:, 'visualstudio_getfileresultfilepath', expand($TEMP).'/vs_getfileresult.vstxt')
-
 let g:visualstudio_quickfixheight =
       \ get(g:, 'visualstudio_quickfixheight', 10)
 
@@ -29,7 +23,7 @@ let g:visualstudio_errorformat =
       \ get(g:, 'visualstudio_errorformat', '%.%#>%f(%l):%m,%.%#>%f(%l\,%c%.%#):%m')
 
 let g:visualstudio_errorlistformat =
-      \ get(g:, 'visualstudio_errorlistformat', '%f\ (%l\\,%c):%m')
+      \ get(g:, 'visualstudio_errorlistformat', '%f (%l\,%c):%m')
 
 let g:visualstudio_findformat =
       \ get(g:, 'visualstudio_findformat', '%f(%l):%m')
