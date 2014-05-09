@@ -259,13 +259,9 @@ endfunction
 
 " open & get file {{{
 function! visualstudio#get_current_file(...)
-    let l:cmd = s:visualstudio_make_command("getfile")
-    if a:0
-        let l:cmd = s:visualstudio_make_command("getfile", "-t", a:1)
-    endif
-    
-    let l:temp = s:visualstudio_system(l:cmd)
-    exe 'e '.l:temp
+    let l:cmd = s:visualstudio_make_command("getcurrentfileinfo", a:0 ? ("-t " . a:1) : "")
+    let l:value = s:vital_datastring.lines(s:visualstudio_system(l:cmd))        
+    exe 'e '. s:vital_datastring.replace(l:value[0], "Name=", "")
 endfunction
 
 function! visualstudio#open_file()
@@ -288,6 +284,21 @@ endfunction
 function! visualstudio#stop_debug_run(...)
     let l:currentfilefullpath = a:0 ? a:1 : s:visualstudio_get_current_buffer_fullpath()
     let l:cmd = s:visualstudio_make_command("stopdebugrun", "-t", l:currentfilefullpath)
+    let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
+endfunction
+
+function! visualstudio#set_startup_project(...)
+    let l:target = a:0 ? a:1 : s:visualstudio_get_current_buffer_fullpath()
+    let l:cmd = s:visualstudio_make_command("getprojectlist", "-t", l:target)
+    let l:temp = s:visualstudio_system(l:cmd)
+    let l:projectlist = s:vital_datastring.lines(l:temp)
+    let l:displaylist = s:visualstudio_make_user_select_list(l:projectlist)
+
+    let l:inputnumber = inputlist(l:displaylist) - 1
+    if l:inputnumber < 0 || l:inputnumber > len(l:displaylist)
+        return 
+    endif
+    let l:cmd = s:visualstudio_make_command("setstartupproject", "-t", l:target, "-p", l:projectlist[l:inputnumber] )
     let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
 endfunction
 "}}}
@@ -389,6 +400,41 @@ function! visualstudio#add_break_point()
     let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
 endfunction
 
+function! visualstudio#go_to_definition()
+    let l:currentfilefullpath = s:visualstudio_get_current_buffer_fullpath()
+    let l:cmd = s:visualstudio_make_command("getlanguagetype", "-t ", l:currentfilefullpath, "-f", l:currentfilefullpath)
+    let l:languagetype = s:vital_datastring.chop(s:visualstudio_system(l:cmd))
+
+    let l:pos = getpos(".")
+    let l:cmd = s:visualstudio_make_command("gotodefinition",
+                                            \ "-t", l:currentfilefullpath,
+                                            \ "-f", l:currentfilefullpath,
+                                            \ "-l", l:pos[1], "-c", l:pos[2],
+                                            \ "-fw", expand('<cword>'))
+    let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
+
+    if l:languagetype == "CSharp"
+        let l:cmd = s:visualstudio_make_command("getcurrentfileinfo", "-t ", l:currentfilefullpath)
+        let l:value = s:vital_datastring.lines(s:visualstudio_system(l:cmd))
+        let l:filename = s:vital_datastring.replace(l:value[0], "Name=", "")
+        let l:line = s:vital_datastring.replace(l:value[2], "Line=", "")
+        let l:column = s:vital_datastring.replace(l:value[3], "Column=", "")
+        exe 'e '. l:filename
+        call cursor(l:line, l:column)
+        
+    elseif l:languagetype == "CPlusPlus"
+        let l:cmd = s:visualstudio_make_command("getfindsymbolresult", "-t ", l:currentfilefullpath)
+        let l:value = s:vital_datastring.lines(s:visualstudio_system(l:cmd))
+        let &errorformat = g:visualstudio_findformat
+        cgetexpr l:value
+        exe 'copen '.g:visualstudio_quickfixheight
+
+    else
+
+    endif
+
+endfunction
+
 function! visualstudio#change_directory(...)
     let l:target = a:0 ? a:1 : s:visualstudio_get_current_buffer_fullpath()
     let l:cmd = s:visualstudio_make_command("getsolutiondirectory", "-t", l:target)
@@ -404,20 +450,7 @@ function! visualstudio#get_all_files(...)
 endfunction
 
 
-function! visualstudio#set_startup_project(...)
-    let l:target = a:0 ? a:1 : s:visualstudio_get_current_buffer_fullpath()
-    let l:cmd = s:visualstudio_make_command("getprojectlist", "-t", l:target)
-    let l:temp = s:visualstudio_system(l:cmd)
-    let l:projectlist = s:vital_datastring.lines(l:temp)
-    let l:displaylist = s:visualstudio_make_user_select_list(l:projectlist)
 
-    let l:inputnumber = inputlist(l:displaylist) - 1
-    if l:inputnumber < 0 || l:inputnumber > len(l:displaylist)
-        return 
-    endif
-    let l:cmd = s:visualstudio_make_command("setstartupproject", "-t", l:target, "-p", l:projectlist[l:inputnumber] )
-    let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
-endfunction
 "}}}
 
 
