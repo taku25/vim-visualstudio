@@ -30,6 +30,7 @@ License : MIT license {{{
           任意                   |vim-visualstudio-install-recommends|
         変数                   |vim-visualstudio-variables|
         コマンド               |vim-visualstudio-command|
+        関数                  |vim-visualstudio-function|
           UniteSource            |vim-visualstudio-unite|
         設定例                 |vim-visualstudio-settings-example|
         ToDo                   |vim-visualstudio-todo|
@@ -115,8 +116,7 @@ License : MIT license {{{
 変数					*vim-visualstudio-variables*
 
 					*g:visualstudio_controllerpath*
-    g:visualstudio_controllerpath	
-
+g:visualstudio_controllerpath	
 	VisualstudioContollerへのパスを設定します
 
 	初期値は {'VisualStudioController.exe'}
@@ -125,39 +125,34 @@ License : MIT license {{{
 	変数変数や'~'を使用する事ができます
 
 					*g:visualstudio_quickfixheight*
-    g:visualstudio_quickfixheight
-    
+g:visualstudio_quickfixheight
 	ビルド結果、エラー一覧や検索結果を表示するquickfixの縦幅を設定します
 
 	初期値は 10
 	
 					*g:visualstudio_errorformat*
-    g:visualstudio_errorformat
-    
+g:visualstudio_errorformat
 	VisualStudioの出力結果ウインドウの内容をquickfixに表示する時に使用する
 	エラーフォーマットを設定します
 
 	初期値は '%.%#>%f(%l):%m,%.%#>%f(%l\,%c%.%#):%m'
 	
 					*g:visualstudio_errorlistformat*
-    g:visualstudio_errorlistformat
-    
+g:visualstudio_errorlistformat
 	VisualStudioのエラー一覧結果ウインドウの内容をquickfixに表示する時に使
 	用するエラーフォーマットを設定します
 
 	初期値は '%f\ (%l\,%c): %m'
 
 					*g:visualstudio_findformat*
-    g:visualstudio_findformat
-    
+g:visualstudio_findformat
 	VisualStudioの検索結果ウインドウの内容をquickfixに表示するときに使用す
 	るエラーフォーマットを設定します
 
 	初期値は '%f\(%l\):%m'
 
 					*g:visualstudio_showautooutput*
-    g:visualstudio_showautooutput
-    
+g:visualstudio_showautooutput
 	VisualStudioのビルド、検索終了時に自動的にquickfixを表示するかを設定し
 	ます
 
@@ -166,8 +161,7 @@ License : MIT license {{{
 	自動的に表示したくないときは0を設定します
 
 					*g:visualstudio_enableerrormarker*
-    g:visualstudio_enableerrormarker
-    
+g:visualstudio_enableerrormarker
 	errormarker.vimを使用している時にエラー箇所がハイライトされるように自
 	動で設定します
 
@@ -176,8 +170,7 @@ License : MIT license {{{
 	自動的に設定したいときは1を設定します
 
 					*g:visualstudio_enablevimproc*
-    g:visualstudio_enablevimproc
-
+g:visualstudio_enablevimproc
 	vimprocを使用するか設定します
 
 	初期値は 1
@@ -187,16 +180,14 @@ License : MIT license {{{
 	は標準の|system|関数を使用します
 					
 					*g:visualstudio_updatetime*
-    g:visualstudio_updatetime
-
+g:visualstudio_updatetime
 	非同期にビルド、検索を行った場合にどれくらいの間隔で終了をチェックする
 	かを設定します
 
 	初期値は 2000(ミリ秒)
 
 					*g:visualstudio_terminalencoding*
-    g:visualstudio_terminalencoding
-
+g:visualstudio_terminalencoding
 	VisualStudioControllerがコンソールに出力するエンコーディングを設定します
 
 	初期値は utf-8
@@ -208,120 +199,104 @@ License : MIT license {{{
 コマンド				*vim-visualstudio-command*
 					
 					*VSCompile*
-    VSCompile
-
+VSCompile
 	編集中のファイルのみをコンパイルします
 	ビルド終了時に自動的にquickfixが開きます
 
 					*VSBuild*
-    VSBuild
-
+VSBuild
 	ソリューションのビルドを行います
 	ビルド終了時に自動的にquickfixが開きます
 	
 					*VSReBuild*
-    VSReBuild
-
+VSReBuild
 	ソリューションのリビルドを行います
 	ビルド終了時に自動的にquickfixが開きます
 
 					*VSCompileNoWait*
-    VSCompileNoWait
-
+VSCompileNoWait
 	編集中のファイルのみをコンパイルします
 	コンパイルの終了待ちを行いません
 
 					*VSBuildNoWait*
-    VSBuildNoWait
-
+VSBuildNoWait
 	ソリューションのビルドを行います
 	コンパイルの終了待ちを行いません
 	|g:visualstudio_enablevimproc|,|g:visualstudio_showautooutput|どちらも
 	有効になっている場合はビルド終了時に自動的にquickfixが開きます
 	
 					*VSReBuildNoWait*
-    VSReBuildNoWait
-
+VSReBuildNoWait
 	ソリューションのリビルドを行います
 	コンパイルの終了待ちを行いません
 	|g:visualstudio_enablevimproc|,|g:visualstudio_showautooutput|どちらも
 	有効になっている場合はビルド終了時に自動的にquickfixが開きます
 
 					*VSCancelBuild*
-    VSCancelBuild
-
+VSCancelBuild
 	ビルドのキャンセルを行います
 	引数がない場合は編集中のファイルが含まれるソリューションをターゲットに
 	します。引数でソリューション名の一部かすべてを設定することでソリュー
 	ションを指定することできます
 
 					*VSClean*
-    VSClean
-
+VSClean
 	ソリューションのクリーンを行います
 	引数がない場合は編集中のファイルが含まれるソリューションをターゲットに
 	します。引数でソリューション名の一部かすべてを設定することでソリュー
 	ションを指定することできます
 
 					*VSOutput*
-    VSOutput
-
+VSOutput
 	出力ウインドウの内容をquickfixに表示します
 	引数がない場合は編集中のファイルが含まれるソリューションをターゲットに
 	します。引数でソリューション名の一部かすべてを設定することでソリュー
 	ションを指定することできます
 
 					*VSErorrList*
-    VSErorrList
-
+VSErorrList
 	エラー一覧ウインドウの内容をquickfixに表示します
 	引数がない場合は編集中のファイルが含まれるソリューションをターゲットに
 	します。引数でソリューション名の一部かすべてを設定することでソリュー
 	ションを指定することできます
 
 					*VSRun*
-    VSRun
-
+VSRun
 	実行します
 	引数がない場合は編集中のファイルが含まれるソリューションをターゲットに
 	します。引数でソリューション名の一部かすべてを設定することでソリュー
 	ションを指定することできます
 
 					*VSDebugRun*
-    VSDebugRun
-
+VSDebugRun
 	デバッグ付きで実行します
 	引数がない場合は編集中のファイルが含まれるソリューションをターゲットに
 	します。引数でソリューション名の一部かすべてを設定することでソリュー
 	ションを指定することできます
 
 					*VSStopDebugRun*
-    VSStopDebugRun
-
+VSStopDebugRun
 	デバッグ実行を終了します
 	引数がない場合は編集中のファイルが含まれるソリューションをターゲットに
 	します。引数でソリューション名の一部かすべてを設定することでソリュー
 	ションを指定することできます
 
 					*VSSetStartUpProject*
-    VSSetStartUpProject
-
+VSSetStartUpProject
 	スタートアッププロジェクトの設定を行います
 	引数がない場合は編集中のファイルが含まれるソリューションをターゲットに
 	します。引数でソリューション名の一部かすべてを設定することでソリュー
 	ションを指定することできます
 
 					*VSSetBuildConfig*
-    VSSetBuildConfig
-
+VSSetBuildConfig
 	ビルドコンフィグの設定を行います
 	引数がない場合は編集中のファイルが含まれるソリューションをターゲットに
 	します。引数でソリューション名の一部かすべてを設定することでソリュー
 	ションを指定することできます
 
 					*VSSetPlatform*
-    VSSetPlatform
-
+VSSetPlatform
 	プラットフォームの設定を行います
 	引数がない場合は編集中のファイルが含まれるソリューションをターゲットに
 	します。引数でソリューション名の一部かすべてを設定することでソリュー
@@ -329,107 +304,363 @@ License : MIT license {{{
 
 
 					*VSFindSolution1*
-    VSFindSolution1(findwhat)
-
+VSFindSolution1(findwhat)
 	引数に与えられた文字列をソリューションを対象に検索を行い、
 	検索結果ウインドウ1に表示します。
 	検索終了時に検索結果をquickfixに表示します
 
 					*VSFindSolution2*
-    VSFindSolution2(findwhat)
-
+VSFindSolution2(findwhat)
 	引数に与えられた文字列をソリューションを対象に検索を行い、
 	検索結果ウインドウ2に表示します。
 	検索終了時に検索結果をquickfixに表示します
 
 					*VSFindSolutionNoWait1*
-    VSFindSolutionNoWait1(findwhat)
-
+VSFindSolutionNoWait1(findwhat)
 	引数に与えられた文字列をソリューションを対象に検索を行い、
 	検索結果ウインドウ1に表示します。検索終了街を行いませんが
 	|g:visualstudio_enablevimproc|,|g:visualstudio_showautooutput|どちらも
 	有効になっている場合はビルド終了時に自動的にquickfixが開きます
 
 					*VSFindSolutionNoWait2*
-    VSFindSolutionNoWait2(findwhat)
-
+VSFindSolutionNoWait2(findwhat)
 	引数に与えられた文字列をソリューションを対象に検索を行い、
 	検索結果ウインドウ2に表示します。検索終了街を行いませんが
 	|g:visualstudio_enablevimproc|,|g:visualstudio_showautooutput|どちらも
 	有効になっている場合はビルド終了時に自動的にquickfixが開きます
 
 					*VSFindProject1*
-    VSFindSolution1(findwhat)
-
+VSFindSolution1(findwhat)
 	引数に与えられた文字列をプロジェクトを対象に検索を行い、
 	検索結果ウインドウ1に表示します。
 	検索終了時に検索結果をquickfixに表示します
 
 					*VSFindProject2*
-    VSFindSolution2(findwhat)
-
+VSFindSolution2(findwhat)
 	引数に与えられた文字列をプロジェクトを対象に検索を行い、
 	検索結果ウインドウ2に表示します。
 	検索終了時に検索結果をquickfixに表示します
 
 					*VSFindProjectNoWait1*
-    VSFindSolutionNoWait1(findwhat)
-
+VSFindSolutionNoWait1(findwhat)
 	引数に与えられた文字列をプロジェクトを対象に検索を行い、
 	検索結果ウインドウ1に表示します。検索終了街を行いませんが
 	|g:visualstudio_enablevimproc|,|g:visualstudio_showautooutput|どちらも
 	有効になっている場合はビルド終了時に自動的にquickfixが開きます
 
 					*VSFindProjectNoWait2*
-    VSFindSolutionNoWait2(findwhat)
-
+VSFindSolutionNoWait2(findwhat)
 	引数に与えられた文字列をプロジェクトを対象に検索を行い、
 	検索結果ウインドウ2に表示します。検索終了街を行いませんが
 	|g:visualstudio_enablevimproc|,|g:visualstudio_showautooutput|どちらも
 	有効になっている場合はビルド終了時に自動的にquickfixが開きます
 
 					*VSFindResult1*
-    VSFindResult1
-
+VSFindResult1
 	検索結果ウインドウ1の内容をquickfixに表示します
 	引数がない場合は編集中のファイルが含まれるソリューションをターゲットに
 	します。引数でソリューション名の一部かすべてを設定することでソリュー
 	ションを指定することできます
 
 					*VSFindResult2*
-    VSFindResult2
-
+VSFindResult2
 	検索結果ウインドウ1の内容をquickfixに表示します
 	引数がない場合は編集中のファイルが含まれるソリューションをターゲットに
 	します。引数でソリューション名の一部かすべてを設定することでソリュー
 	ションを指定することできます
 					
 					*VSOpenFile*
-    VSOpenFile
-
+VSOpenFile
 	Vimで編集中のファイルをVisualStudioで開きます
 
 					*VSGetFile*
-    VSGetFile
-
+VSGetFile
 	VisualStudioで編集のファイルをVimで開きます
 	引数にソリューション名の一部かすべてを設定することでVisualStudioを
 	指定することできます
 
 					*VSAddBreakPoint*
-    VSAddBreakPoint
-
+VSAddBreakPoint
 	Vimで編集中のファイル＋カーソルがある行にブレークポイントをセットしま
 	す
 
 					*VSChangeDirectory*
-    VSChangeDirectory
-
+VSChangeDirectory
 	ソリューションのある場所に移動します
 	引数でソリューション名の一部かすべてを設定することでソリュー
 	ションを指定することできます
+
+					*VSGoToDefinition*
+VSGoToDefinition
+	カーソル下の単語の参照先にジャンプします
+	C#を編集中は移動しますが
+	C/C++編集中はカーソル下の単語でシンボルの検索した結果をquickfixに表示します
+	(VisualStudioの仕様です....)
+
+==============================================================================
+関数				*vim-visualstudio-function*
 					
+					*visualstudio#compile_file()*
+visualstudio#compile_file({wait})
+	Vimで編集中のファイルをコンパイルします。
+
+	"wait"
+		1 終了待ちします
+		0 終了待ちしません
+	
+					*visualstudio#build_solution()*
+visualstudio#build_solution({buildtype}, {wait})
+	Vimで編集中のファイルが含まれるソリューションをビルドします
+
+	"buildtype"
+		"build" ビルドします
+		"rebuild" リビルドします
+
+	"wait"
+		1 終了待ちします
+		0 終了待ちしません
+
+					*visualstudio#set_build_config()*
+visualstudio#set_build_config({name})
+	対象ソリューションのビルド設定を変更します
+
+	"name"
+		省略可能
+		ビルド構成を変更するソリューションの名前、名前の一部、フルパス
+		ビルド構成を変更するプロジェクトの名前、名前の一部、フルパス
+		ソリューションに含まれるファイルのフルパス
+		の何か一つを入力します。
+		省略した場合は
+		Vimで編集中のファイル名を使います
+		またVimで編集のファイルがない場合は最初に見つかったソリューション
+		を対象にします
+
+					*visualstudio#set_build_platform()*
+visualstudio#set_build_platform({name})
+	対象ソリューションのビルドプラットフォームを変更します
+
+	"name"
+		省略可能
+		ビルド構成を変更するソリューションの名前、名前の一部、フルパス
+		ビルド構成を変更するプロジェクトの名前、名前の一部、フルパス
+		ソリューションに含まれるファイルのフルパス
+		の何か一つを入力します。
+		省略した場合は
+		Vimで編集中のファイル名を使います
+		またVimで編集のファイルがない場合は最初に見つかったソリューション
+		を対象にします
+
+					*visualstudio#cancel_build()*
+visualstudio#cancel_build({name})
+	対象ソリューションのビルドを中止します
+
+	"name"
+		省略可能
+		ビルド構成を変更するソリューションの名前、名前の一部、フルパス
+		ビルド構成を変更するプロジェクトの名前、名前の一部、フルパス
+		ソリューションに含まれるファイルのフルパス
+		の何か一つを入力します。
+		省略した場合は
+		Vimで編集中のファイル名を使います
+		またVimで編集のファイルがない場合は最初に見つかったソリューション
+		を対象にします
 					
+					*visualstudio#clean_solution()*
+visualstudio#clean_solution({name})
+	対象ソリューションをクリーンします
+
+	"name"
+		省略可能
+		ビルド構成を変更するソリューションの名前、名前の一部、フルパス
+		ビルド構成を変更するプロジェクトの名前、名前の一部、フルパス
+		ソリューションに含まれるファイルのフルパス
+		の何か一つを入力します。
+		省略した場合は
+		Vimで編集中のファイル名を使います
+		またVimで編集のファイルがない場合は最初に見つかったソリューション
+		を対象にします
+
+					*visualstudio#open_output()*
+visualstudio#open_output({name})
+	対象ソリューションの出力ウインドウの内容をquickfixに表示します
+
+	"name"
+		省略可能
+		ビルド構成を変更するソリューションの名前、名前の一部、フルパス
+		ビルド構成を変更するプロジェクトの名前、名前の一部、フルパス
+		ソリューションに含まれるファイルのフルパス
+		の何か一つを入力します。
+		省略した場合は
+		Vimで編集中のファイル名を使います
+		またVimで編集のファイルがない場合は最初に見つかったソリューション
+		を対象にします
+
+					*visualstudio#open_error_list()*
+visualstudio#open_error_list({name})
+	対象ソリューションのエラーウインドウの内容をquickfixに表示します
+
+	"name"
+		省略可能
+		ビルド構成を変更するソリューションの名前、名前の一部、フルパス
+		ビルド構成を変更するプロジェクトの名前、名前の一部、フルパス
+		ソリューションに含まれるファイルのフルパス
+		の何か一つを入力します。
+		省略した場合は
+		Vimで編集中のファイル名を使います
+		またVimで編集のファイルがない場合は最初に見つかったソリューション
+		を対象にします
+					
+					*visualstudio#run()*
+visualstudio#run({runtype},{name})
+	対象のソリューションを実行します
+
+	"runtype"
+		0 実行
+		1 デバッグ実行
+		
+	"name"
+		省略可能
+		ビルド構成を変更するソリューションの名前、名前の一部、フルパス
+		ビルド構成を変更するプロジェクトの名前、名前の一部、フルパス
+		ソリューションに含まれるファイルのフルパス
+		の何か一つを入力します。
+		省略した場合は
+		Vimで編集中のファイル名を使います
+		またVimで編集のファイルがない場合は最初に見つかったソリューション
+		を対象にします
+					
+					*visualstudio#stop_debug_run()*
+visualstudio#stop_debug_run({name})
+	対象ソリューションで実行中のデバッグを終了します
+
+	"name"
+		省略可能
+		ビルド構成を変更するソリューションの名前、名前の一部、フルパス
+		ビルド構成を変更するプロジェクトの名前、名前の一部、フルパス
+		ソリューションに含まれるファイルのフルパス
+		の何か一つを入力します。
+		省略した場合は
+		Vimで編集中のファイル名を使います
+		またVimで編集のファイルがない場合は最初に見つかったソリューション
+		を対象にします
+
+					*visualstudio#set_startup_project()*
+visualstudio#set_startup_project({name})
+	対象ソリューションのスタートアッププロジェクトを設定ます
+
+	"name"
+		省略可能
+		ビルド構成を変更するソリューションの名前、名前の一部、フルパス
+		ビルド構成を変更するプロジェクトの名前、名前の一部、フルパス
+		ソリューションに含まれるファイルのフルパス
+		の何か一つを入力します。
+		省略した場合は
+		Vimで編集中のファイル名を使います
+		またVimで編集のファイルがない場合は最初に見つかったソリューション
+		を対象にします
+
+					*visualstudio#find()*
+visualstudio#find({findTarget}, {resultLocationType}, {wait}, {findwhat}, {name})
+	対象ソリューションのスタートアッププロジェクトを設定ます
+	
+	"findTarget"
+		検索対象を設定します
+		"solution"ソリューションを対象に検索します
+		"project" プロジェクトを対象に検索します
+		{name}でソリューション名を設定した場合はスタートアッププロジェクト
+		を対象に検索します。
+		{name}でソリューションに含まれるフルパスを設定した場合はそれが
+		含まれるプロジェクトを対象に検索します
+
+	"resultLocationType"
+		検索結果を表示する場所を設定します
+		0 検索結果ウインドウ1に表示します
+		1 検索結果ウインドウ2に表示します
+
+	"wait"
+		終了待ちをするか
+		1 終了待ちします
+		0 終了待ちしません
+		
+	"findwhat"
+		検索ワード
+
+	"name"
+		省略可能
+		ビルド構成を変更するソリューションの名前、名前の一部、フルパス
+		ビルド構成を変更するプロジェクトの名前、名前の一部、フルパス
+		ソリューションに含まれるファイルのフルパス
+		の何か一つを入力します。
+		省略した場合は
+		Vimで編集中のファイル名を使います
+		またVimで編集のファイルがない場合は最初に見つかったソリューション
+		を対象にします
+
+					*visualstudio#open_find_result()*
+visualstudio#open_find_result({resultLocationType}, {name})
+	対象ソリューションの検索結果ウインドウの内容をquickfixに表示します
+
+	"resultLocationType"
+		検索結果を表示する場所を設定します
+		0 検索結果ウインドウ1に表示します
+		1 検索結果ウインドウ2に表示します
+
+	"name"
+		省略可能
+		ビルド構成を変更するソリューションの名前、名前の一部、フルパス
+		ビルド構成を変更するプロジェクトの名前、名前の一部、フルパス
+		ソリューションに含まれるファイルのフルパス
+		の何か一つを入力します。
+		省略した場合は
+		Vimで編集中のファイル名を使います
+		またVimで編集のファイルがない場合は最初に見つかったソリューション
+		を対象にします
+					
+					*visualstudio#open_file()*
+visualstudio#open_file()
+	Vimで編集中のファイルをVisualStudioで開きます
+
+					*visualstudio#get_current_file()*
+visualstudio#get_current_file({name})
+	VisualStudioのカレントドキュメントをVimで開きます
+
+	"name"
+		省略可能
+		ビルド構成を変更するソリューションの名前、名前の一部、フルパス
+		ビルド構成を変更するプロジェクトの名前、名前の一部、フルパス
+		ソリューションに含まれるファイルのフルパス
+		の何か一つを入力します。
+		省略した場合は
+		Vimで編集中のファイル名を使います
+		またVimで編集のファイルがない場合は最初に見つかったソリューション
+		を対象にします
+					
+					*visualstudio#add_break_point()*
+visualstudio#add_break_point()
+	Vimで編集中のファイル、カーソル行にブレークポイントを設定します
+
+					*visualstudio#change_directory()*
+visualstudio#change_directory({name})
+	対象のソリューションが置かれているディレクトリに移動します
+
+	"name"
+		省略可能
+		ビルド構成を変更するソリューションの名前、名前の一部、フルパス
+		ビルド構成を変更するプロジェクトの名前、名前の一部、フルパス
+		ソリューションに含まれるファイルのフルパス
+		の何か一つを入力します。
+		省略した場合は
+		Vimで編集中のファイル名を使います
+		またVimで編集のファイルがない場合は最初に見つかったソリューション
+		を対象にします
+					
+					*visualstudio#go_to_definition()*
+visualstudio#go_to_definition()
+	カーソル下の単語の参照先にジャンプします
+	C#を編集中は移動しますが
+	C/C++編集中はカーソル下の単語でシンボルの検索した結果をquickfixに表示します
+	(VisualStudioの仕様です....)
+
 ------------------------------------------------------------------------------
 UniteSource				*vim-visualstudio-unite*
 	    

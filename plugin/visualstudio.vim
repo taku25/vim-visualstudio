@@ -47,13 +47,13 @@ let g:visualstudio_terminalencoding =
 " vim-visualstudio functions {{{
 
 " build {{{
-command! VSCompile call visualstudio#compile_file("-w")
-command! VSBuild call visualstudio#build_solution("build", "-w")
-command! VSReBuild call visualstudio#build_solution("rebuild", "-w")
+command! VSCompile call visualstudio#compile_file(1)
+command! VSBuild call visualstudio#build_solution("build", 1)
+command! VSReBuild call visualstudio#build_solution("rebuild", 1)
 
-command! VSCompileNoWait call visualstudio#compile_file("")
-command! VSBuildNoWait call visualstudio#build_solution("build", "")
-command! VSReBuildNoWait call visualstudio#build_solution("rebuild", "")
+command! VSCompileNoWait call visualstudio#compile_file(0)
+command! VSBuildNoWait call visualstudio#build_solution("build", 0)
+command! VSReBuildNoWait call visualstudio#build_solution("rebuild", 0)
 
 " config {{{
 command! -nargs=? VSSetBuildConfig call visualstudio#set_build_config(<f-args>)
@@ -87,17 +87,17 @@ command! -nargs=? VSStopDebugRun call visualstudio#stop_debug_run(<f-args>)
 "find {{{
 
 " solution {{{
-command! -nargs=+ VSFindSolution1 call visualstudio#find("solution", "one", "-w", <f-args>)
-command! -nargs=+ VSFindSolution2 call visualstudio#find("solution", "two", "-w", <f-args>)
-command! -nargs=+ VSFindSolutionNoWait1 call visualstudio#find("solution", "one", "", <f-args>)
-command! -nargs=+ VSFindSolutionNoWait2 call visualstudio#find("solution", "two", "", <f-args>)
+command! -nargs=+ VSFindSolution1 call visualstudio#find("solution", 0, 1, <f-args>)
+command! -nargs=+ VSFindSolution2 call visualstudio#find("solution", 1, 1, <f-args>)
+command! -nargs=+ VSFindSolutionNoWait1 call visualstudio#find("solution", 0, 0, <f-args>)
+command! -nargs=+ VSFindSolutionNoWait2 call visualstudio#find("solution", 1, 0, <f-args>)
 "}}}
 
 " project {{{
-command! -nargs=+ VSFindProject1 call visualstudio#find("project", "one", "-w", <f-args>)
-command! -nargs=+ VSFindProject2 call visualstudio#find("project", "two", "-w", <f-args>)
-command! -nargs=+ VSFindProjectNoWait1 call visualstudio#find("project", "one", "", <f-args>)
-command! -nargs=+ VSFindProjectNoWait2 call visualstudio#find("project", "two", "", <f-args>)
+command! -nargs=+ VSFindProject1 call visualstudio#find("project", 0, 1, <f-args>)
+command! -nargs=+ VSFindProject2 call visualstudio#find("project", 1, 1, <f-args>)
+command! -nargs=+ VSFindProjectNoWait1 call visualstudio#find("project", 0, 0, <f-args>)
+command! -nargs=+ VSFindProjectNoWait2 call visualstudio#find("project", 1, 0, <f-args>)
 "}}}
 
 " result  {{{

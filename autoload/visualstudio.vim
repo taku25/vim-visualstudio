@@ -19,7 +19,7 @@ augroup END
 let s:visualstudio_temp_result =""
 let s:visualstudio_install_vimproc = 0
 let s:visualstudio_last_target_solution_fullpath = ""
-let s:visualstudio_last_find_result_location = ""
+let s:visualstudio_last_find_result_location = 0
 let s:visualstudio_global_update_time = &updatetime
 "}}}
 
@@ -132,11 +132,11 @@ function! s:visualstudio_check_finished(checkType)
         if a:checkType == "build"
             call visualstudio#open_output(shellescape(s:visualstudio_last_target_solution_fullpath))
         elseif a:checkType == "find"
-            call visualstudio#open_find_result(s:visualstudio_last_find_result_location == "one" ? 0 : 1, shellescape(s:visualstudio_last_target_solution_fullpath))
+            call visualstudio#open_find_result(s:visualstudio_last_find_result_location, shellescape(s:visualstudio_last_target_solution_fullpath))
         endif
         
         let s:visualstudio_last_target_solution_fullpath = "" 
-        let s:visualstudio_last_find_result_location = "" 
+        let s:visualstudio_last_find_result_location = 0 
     endif
 endfunction
 
@@ -156,9 +156,9 @@ endfunction
 " build {{{
 function! visualstudio#build_solution(buildtype, wait)
     let l:currentfilefullpath = s:visualstudio_get_current_buffer_fullpath()
-    let l:cmd = s:visualstudio_make_command(a:buildtype, "-t", l:currentfilefullpath, a:wait)
+    let l:cmd = s:visualstudio_make_command(a:buildtype, "-t", l:currentfilefullpath, a:wait == 0 ? "" : "-w")
     
-    if a:wait == "-w"
+    if a:wait == 1
         let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
         if g:visualstudio_showautooutput == 1
             call visualstudio#open_output(l:currentfilefullpath)
@@ -195,9 +195,9 @@ endfunction
 
 function! visualstudio#compile_file(wait)
     let l:currentfilefullpath = s:visualstudio_get_current_buffer_fullpath()
-    let l:cmd = s:visualstudio_make_command("compilefile", "-t", l:currentfilefullpath, "-f", l:currentfilefullpath, a:wait)
+    let l:cmd = s:visualstudio_make_command("compilefile", "-t", l:currentfilefullpath, "-f", l:currentfilefullpath, a:wait == 0 ? "" : "-w")
     let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
-    if a:wait != "" && g:visualstudio_showautooutput==1
+    if a:wait == 1 && g:visualstudio_showautooutput==1
         call visualstudio#open_output(l:currentfilefullpath)
     endif
 endfunction                  
@@ -274,10 +274,7 @@ endfunction
 " run & stop {{{
 function! visualstudio#run(runType, ...)
     let l:currentfilefullpath = a:0 ? a:1 : s:visualstudio_get_current_buffer_fullpath()
-    let l:cmd = s:visualstudio_make_command("run", "-t", l:currentfilefullpath)
-    if a:runType == 1
-        let l:cmd = s:visualstudio_make_command("debugrun", "-t", l:currentfilefullpath)
-    endif
+    let l:cmd = s:visualstudio_make_command(a:runType == 0 ? "run" : "debugrun", "-t", l:currentfilefullpath)
     let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
 endfunction
 
@@ -313,14 +310,14 @@ function! visualstudio#find(findTarget, resultLocationType, wait, ...)
     let l:target = a:0 == 2 ? a:2 : s:visualstudio_get_current_buffer_fullpath()
     let l:cmd = s:visualstudio_make_command("find", "-t", l:target,
                                             \ "-fw", a:1,
-                                            \ a:wait,
-                                            \ "-fl", a:resultLocationType,
+                                            \ a:wait == 0 ? "" : "-w",
+                                            \ "-fl", a:resultLocationType == 0 ? "one" : "two",
                                             \ "-ft", a:findTarget)
 
-    if a:wait == "-w"
+    if a:wait == 1
         let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
         if g:visualstudio_showautooutput == 1
-            call visualstudio#open_find_result(a:resultLocationType == "one" ? 0 : 1, l:target)
+            call visualstudio#open_find_result(a:resultLocationType, l:target)
         endif
     else
 
