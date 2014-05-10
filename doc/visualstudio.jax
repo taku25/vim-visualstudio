@@ -476,9 +476,13 @@ visualstudio#cancel_build({name})
 		またVimで編集のファイルがない場合は最初に見つかったソリューション
 		を対象にします
 					
-					*visualstudio#clean_solution()*
-visualstudio#clean_solution({name})
+					*visualstudio#clean()*
+visualstudio#clean({cleanTarget}, {name})
 	対象ソリューションをクリーンします
+	
+	"cleanTarget"
+		"solution" ソリューションを対象にクリーンします
+		"project" プロジェクトを対象にクリーンします
 
 	"name"
 		省略可能

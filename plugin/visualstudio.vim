@@ -50,10 +50,14 @@ let g:visualstudio_terminalencoding =
 command! -nargs=? VSCompile call visualstudio#compile(1, <f-args>)
 command! VSBuild call visualstudio#build("build", 1)
 command! VSReBuild call visualstudio#build("rebuild", 1)
+command! VSBuildProject call visualstudio#build("buildproject", 1)
+command! VSReBuildProject call visualstudio#build("rebuildproject", 1)
 
 command! -nargs=? VSCompileNoWait call visualstudio#compile(0, <f-args>)
 command! VSBuildNoWait call visualstudio#build("build", 0)
 command! VSReBuildNoWait call visualstudio#build("rebuild", 0)
+command! VSBuildProject call visualstudio#build("buildproject", 0)
+command! VSReBuildProject call visualstudio#build("rebuildproject", 0)
 
 " config {{{
 command! -nargs=? VSSetBuildConfig call visualstudio#set_build_config(<f-args>)
@@ -65,7 +69,7 @@ command! -nargs=? VSCancelBuild call visualstudio#cancel_build(<f-args>)
 " }}}
 
 " clean {{{
-command! -nargs=? VSClean call visualstudio#clean_solution(<f-args>)
+command! -nargs=? VSClean call visualstudio#clean("solution", <f-args>)
 "}}}
 
 " result  {{{

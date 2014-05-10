@@ -212,9 +212,10 @@ endfunction
 "}}}
 
 " clean {{{
-function! visualstudio#clean_solution(...)
+function! visualstudio#clean(cleanTarget, ...)
     let l:currentfilefullpath = a:0 ? a:1 : s:visualstudio_get_current_buffer_fullpath() 
-    let l:cmd = s:visualstudio_make_command("clean", "-t", l:currentfilefullpath )
+    let l:command = a:cleanTarget == "solution" ? "clean" : "cleanproject" 
+    let l:cmd = s:visualstudio_make_command(l:command, "-t", l:currentfilefullpath )
     let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
 endfunction
 "}}}
