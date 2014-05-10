@@ -400,16 +400,27 @@ VSGoToDefinition
 ==============================================================================
 関数				*vim-visualstudio-function*
 					
-					*visualstudio#compile_file()*
-visualstudio#compile_file({wait})
+					*visualstudio#compile()*
+visualstudio#compile({wait}, {name})
 	Vimで編集中のファイルをコンパイルします。
 
 	"wait"
 		1 終了待ちします
 		0 終了待ちしません
 	
-					*visualstudio#build_solution()*
-visualstudio#build_solution({buildtype}, {wait})
+	"name"
+		省略可能
+		ビルド構成を変更するソリューションの名前、名前の一部、フルパス
+		ビルド構成を変更するプロジェクトの名前、名前の一部、フルパス
+		ソリューションに含まれるファイルのフルパス
+		の何か一つを入力します。
+		省略した場合は
+		Vimで編集中のファイル名を使います
+		またVimで編集のファイルがない場合は最初に見つかったソリューション
+		を対象にします
+
+					*visualstudio#build()*
+visualstudio#build({buildtype}, {wait})
 	Vimで編集中のファイルが含まれるソリューションをビルドします
 
 	"buildtype"
@@ -674,8 +685,16 @@ UniteSource				*vim-visualstudio-unite*
 ==============================================================================
 設定例					*vim-visualstudio-settings-example*
 >
-<
-
+	"like to visual c++ 6.0 {{{
+		nnoremap <silent> <F7> :VSBuildNoWait<CR>
+		nnoremap <silent> <M-F7> :VSReBuildNoWait<CR>
+		nnoremap <silent> <F5> :VSDebugRun<CR>
+		nnoremap <silent> <C-F5> :VSRun<CR>
+		nnoremap <silent> <C-b> :VSCancelBuild<CR>
+		nnoremap <silent> <F9> :VSAddBreakPoint<CR>
+		nnoremap <silent> <Leader>gf :VSGetFile<CR>
+		nnoremap <silent> <Leader>gd :VSGoToDefinition<CR>
+	"}}}
 ==============================================================================
 TODO					*vim-visualstudio-todo*
 

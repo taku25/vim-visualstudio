@@ -47,13 +47,13 @@ let g:visualstudio_terminalencoding =
 " vim-visualstudio functions {{{
 
 " build {{{
-command! VSCompile call visualstudio#compile_file(1)
-command! VSBuild call visualstudio#build_solution("build", 1)
-command! VSReBuild call visualstudio#build_solution("rebuild", 1)
+command! -nargs=? VSCompile call visualstudio#compile(1, <f-args>)
+command! VSBuild call visualstudio#build("build", 1)
+command! VSReBuild call visualstudio#build("rebuild", 1)
 
-command! VSCompileNoWait call visualstudio#compile_file(0)
-command! VSBuildNoWait call visualstudio#build_solution("build", 0)
-command! VSReBuildNoWait call visualstudio#build_solution("rebuild", 0)
+command! -nargs=? VSCompileNoWait call visualstudio#compile(0, <f-args>)
+command! VSBuildNoWait call visualstudio#build("build", 0)
+command! VSReBuildNoWait call visualstudio#build("rebuild", 0)
 
 " config {{{
 command! -nargs=? VSSetBuildConfig call visualstudio#set_build_config(<f-args>)

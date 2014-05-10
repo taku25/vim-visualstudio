@@ -154,7 +154,7 @@ endfunction
 " compile & build "{{{
 
 " build {{{
-function! visualstudio#build_solution(buildtype, wait)
+function! visualstudio#build(buildtype, wait)
     let l:currentfilefullpath = s:visualstudio_get_current_buffer_fullpath()
     let l:cmd = s:visualstudio_make_command(a:buildtype, "-t", l:currentfilefullpath, a:wait == 0 ? "" : "-w")
     
@@ -193,8 +193,8 @@ function! visualstudio#build_solution(buildtype, wait)
     endif
 endfunction
 
-function! visualstudio#compile_file(wait)
-    let l:currentfilefullpath = s:visualstudio_get_current_buffer_fullpath()
+function! visualstudio#compile(wait, ...)
+    let l:currentfilefullpath = a:0 != 0 ? a:1 : s:visualstudio_get_current_buffer_fullpath()
     let l:cmd = s:visualstudio_make_command("compilefile", "-t", l:currentfilefullpath, "-f", l:currentfilefullpath, a:wait == 0 ? "" : "-w")
     let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
     if a:wait == 1 && g:visualstudio_showautooutput==1
