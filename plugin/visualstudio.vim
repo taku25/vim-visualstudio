@@ -104,6 +104,11 @@ command! -nargs=+ VSFindProjectNoWait1 call visualstudio#find("project", 0, 0, <
 command! -nargs=+ VSFindProjectNoWait2 call visualstudio#find("project", 1, 0, <f-args>)
 "}}}
 
+" symbol {{{
+command! VSFindSymbol call visualstudio#find_symbol(1)
+command! VSFindSymbolNoWait call visualstudio#find_symbol(0)
+"}}}
+
 " result  {{{
 command! -nargs=? VSFindResult1 call visualstudio#open_find_result(0, <f-args>)
 command! -nargs=? VSFindResult2 call visualstudio#open_find_result(1, <f-args>)

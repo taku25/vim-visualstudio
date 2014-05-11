@@ -128,11 +128,12 @@ function! s:visualstudio_check_finished(checkType)
     if  l:status == 'inactive'
         call s:visualstudio_clear_process_and_augroup()
 
-        echo "check"
         if a:checkType == "build"
             call visualstudio#open_output(shellescape(s:visualstudio_last_target_solution_fullpath))
         elseif a:checkType == "find"
             call visualstudio#open_find_result(s:visualstudio_last_find_result_location, shellescape(s:visualstudio_last_target_solution_fullpath))
+        elseif a:checkType == "findsymbol"
+            call visualstudio#open_find_symbol_result(shellescape(s:visualstudio_last_target_solution_fullpath))
         endif
         
         let s:visualstudio_last_target_solution_fullpath = "" 
@@ -265,6 +266,17 @@ function! visualstudio#get_current_file(...)
     exe 'e '. s:vital_datastring.replace(l:value[0], "Name=", "")
 endfunction
 
+function! visualstudio#sync_current_file(...)
+    let l:target = a:0 == 1 ? a:1 : s:visualstudio_get_current_buffer_fullpath()
+    let l:cmd = s:visualstudio_make_command("getcurrentfileinfo", "-t ", l:target)
+    let l:value = s:vital_datastring.lines(s:visualstudio_system(l:cmd))
+    let l:filename = s:vital_datastring.replace(l:value[0], "Name=", "")
+    let l:line = s:vital_datastring.replace(l:value[2], "Line=", "")
+    let l:column = s:vital_datastring.replace(l:value[3], "Column=", "")
+    exe 'e '. l:filename
+    call cursor(l:line, l:column)
+endfunction
+
 function! visualstudio#open_file()
     let currentfilefullpath = s:visualstudio_get_current_buffer_fullpath()
     let l:cmd = s:visualstudio_make_command("openfile", "-t", currentfilefullpath, "-f", currentfilefullpath)
@@ -350,10 +362,68 @@ function! visualstudio#find(findTarget, resultLocationType, wait, ...)
     endif
 endfunction
 
+function! visualstudio#find_symbol(wait)
+    let l:currentfilefullpath = s:visualstudio_get_current_buffer_fullpath()
+
+    let l:pos = getpos(".")
+    let l:findwhat = expand('<cword>')
+    if l:findwhat == ""
+        return
+    endif
+
+    let l:cmd = s:visualstudio_make_command("findsymbol",
+                                            \ "-t", l:currentfilefullpath,
+                                            \ "-f", l:currentfilefullpath,
+                                            \ "-l", l:pos[1], "-c", l:pos[2],
+                                            \ "-fw", l:findwhat,
+                                            \ a:wait == 0 ? "" : "-w")
+                                            
+    if a:wait == 1
+        let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
+        if g:visualstudio_showautooutput == 1
+            call visualstudio#open_find_symbol_result(l:currentfilefullpath)
+        endif
+    else
+
+        let l:enableVimproc = s:visualstudio_enable_vimproc()
+        "waitなしでvimprocが使えない時は自動表示はしない
+        if l:enableVimproc == 0
+            let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
+        else
+            if g:visualstudio_showautooutput == 0
+                let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
+            else
+                "waitなし かつ vimprocが使用できる かつ　自動表示時のみ
+                "processmanagerを使用する
+                let l:tempcmd = s:visualstudio_make_command("getsolutionfullpath", "-t", l:currentfilefullpath)
+                let l:solutionfullpath = s:vital_datastring.chop(s:visualstudio_system(l:tempcmd))
+                if s:visualstudio_last_target_solution_fullpath == l:solutionfullpath
+                    call s:visualstudio_clear_process_and_augroup()
+                endif
+                let s:visualstudio_last_target_solution_fullpath = l:solutionfullpath
+                "起動
+                call s:vital_processmanager.touch("visualstudio", l:cmd . " -w")
+                let &updatetime = g:visualstudio_updatetime
+                augroup plugin-visualstudio
+                    execute 'autocmd! CursorHold,CursorHoldI * call' 's:visualstudio_check_finished("findsymbol")'
+                augroup END
+            endif
+        endif
+    endif
+endfunction
 
 function! visualstudio#open_find_result(findType, ...)
     let l:currentfilefullpath = a:0 != 0 ? a:1 : s:visualstudio_get_current_buffer_fullpath()
     let l:cmd = s:visualstudio_make_command(a:findType == 0 ? "getfindresult1" : "getfindresult2", "-t", l:currentfilefullpath)
+    let l:value = s:vital_datastring.lines(s:visualstudio_system(l:cmd))        
+    let &errorformat = g:visualstudio_findformat
+    cgetexpr l:value
+    exe 'copen '.g:visualstudio_quickfixheight
+endfunction
+
+function! visualstudio#open_find_symbol_result(...)
+    let l:currentfilefullpath = a:0 != 0 ? a:1 : s:visualstudio_get_current_buffer_fullpath()
+    let l:cmd = s:visualstudio_make_command("getfindsymbolresult", "-t", l:currentfilefullpath)
     let l:value = s:vital_datastring.lines(s:visualstudio_system(l:cmd))        
     let &errorformat = g:visualstudio_findformat
     cgetexpr l:value
@@ -412,23 +482,9 @@ function! visualstudio#go_to_definition()
     let s:visualstudio_temp_result = s:visualstudio_system(l:cmd)
 
     if l:languagetype == "CSharp"
-        let l:cmd = s:visualstudio_make_command("getcurrentfileinfo", "-t ", l:currentfilefullpath)
-        let l:value = s:vital_datastring.lines(s:visualstudio_system(l:cmd))
-        let l:filename = s:vital_datastring.replace(l:value[0], "Name=", "")
-        let l:line = s:vital_datastring.replace(l:value[2], "Line=", "")
-        let l:column = s:vital_datastring.replace(l:value[3], "Column=", "")
-        exe 'e '. l:filename
-        call cursor(l:line, l:column)
-        
-    elseif l:languagetype == "CPlusPlus"
-        let l:cmd = s:visualstudio_make_command("getfindsymbolresult", "-t ", l:currentfilefullpath)
-        let l:value = s:vital_datastring.lines(s:visualstudio_system(l:cmd))
-        let &errorformat = g:visualstudio_findformat
-        cgetexpr l:value
-        exe 'copen '.g:visualstudio_quickfixheight
-
+        call visualstudio#sync_current_file(l:currentfilefullpath)
     else
-
+        cal visualstudio#open_find_symbol_result(l:currentfilefullpath)
     endif
 
 endfunction
