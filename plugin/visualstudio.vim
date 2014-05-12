@@ -26,7 +26,7 @@ let g:visualstudio_errorlistformat =
       \ get(g:, 'visualstudio_errorlistformat', '%f (%l\,%c):%m')
 
 let g:visualstudio_findformat =
-      \ get(g:, 'visualstudio_findformat', '%f(%l):%m')
+      \ get(g:, 'visualstudio_findformat', '%f(%l):%m,%f(%l\,%c):%m')
 
 let g:visualstudio_showautooutput =
       \ get(g:, 'visualstudio_showautooutput', 1)
@@ -112,6 +112,7 @@ command! VSFindSymbolNoWait call visualstudio#find_symbol(0)
 " result  {{{
 command! -nargs=? VSFindResult1 call visualstudio#open_find_result(0, <f-args>)
 command! -nargs=? VSFindResult2 call visualstudio#open_find_result(1, <f-args>)
+command! -nargs=? VSFindSymbolResult call visualstudio#open_find_symbol_result(<f-args>)
 "}}}
 
 "}}}
