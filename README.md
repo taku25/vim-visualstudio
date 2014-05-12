@@ -1,7 +1,7 @@
 # vim-visualstudio  
 
 ## Description
-plugin operates Vim to VisualStudio
+plugin operates Vim to Visual Studio
 
 ![image](https://dl.dropboxusercontent.com/u/45602523/vim-visualstudio.gif)
 
